@@ -1,0 +1,6 @@
+<option value="" selected>선택</option>
+<option th:each="folder : ${aprvFolders}"
+        th:text="${folder.typeFolderName}"
+        th:value="${folder.typeFolderNo}">
+</option>
+

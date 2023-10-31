@@ -1,0 +1,9 @@
+<!--   Deps 전체 조회 하는 카드    -->
+<tr th:each="allDepartmentList, iterStat  : ${departRespList}">
+    <td th:text="${allDepartmentList.memberNameKr}"></td>
+    <td th:text="${allDepartmentList.departmentName}"></td>
+    <td th:text="${allDepartmentList.staffName}"></td>
+    <td th:text="${allDepartmentList.updateDate}"></td>
+    <td th:text="${allDepartmentList.memberFlag}"></td>
+    <td> <button class="btn_md" type="button" th:onclick="'modal_onoff(1, 1); adminMemberModifyForm(\'' + ${allDepartmentList.memberNo} + '\')'">수정</button>
+</tr>

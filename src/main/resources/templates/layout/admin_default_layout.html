@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--라이브러리 참조 : Thymeleaf & Thymeleaf Layout -->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="명령어" name="robots"/>
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link href="대표URL" rel="canonical"/>
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta content="페이지 설명" name="description"/>
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta content="keyword1, keyword2" name="keywords"/>
+  <!-- 소셜 미디어 공유 -->
+  <meta content="website" property="og:type"/>
+  <meta content="(주)뎁스" property="og:title"/>
+  <meta content="(주)뎁스" property="og:description"/>
+  <meta content="http://www.mysite.com/myimage.jpg" property="og:image"/>
+  <meta content="http://www.mysite.com" property="og:url"/>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet"/>
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script th:inline="javascript" type="text/javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+  </script>
+  <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+          rel="stylesheet"
+  />
+  <!--  외부 css-->
+  <th:block th:replace="fragments/config :: configFragment"></th:block>
+  <!--  페이지마다 스타일-->
+  <th:block layout:fragment="css"></th:block>
+</head>
+<!--공통 JS / CSS 영역을 관리하는 환경 영역-->
+<body>
+<div>
+  <!--Header 영역을 참조합니다.-->
+  <th:block th:replace="fragments/admin_header :: header"></th:block>
+  <th:block th:replace="fragments/leftmenu/leftmenu_admin_organization :: leftmenu"></th:block>
+  <th:block layout:fragment="content"></th:block>
+
+</div>
+
+<!--Footer 영역을 참조합니다.-->
+<!--<footer th:replace="fragments/footer :: FooterFragment"></footer>-->
+</body>
+</html>

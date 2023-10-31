@@ -1,0 +1,68 @@
+
+<div class="treemenu" th:fragment="treeMenu(folderTreeRespList)">
+    <div class="treemenu_tit depth1_active">
+        <span><a href="/admin/aprv/aprvMgt">전자 결재 관리</a></span>
+    </div>
+    <div class="treemenu_tit">
+        <span><a href="/admin/aprv/aprvType">문서 양식 관리</a></span>
+        <button type="button" class="btn_sm navy" onclick="modal_onoff(3,1)">폴더 추가</button>
+    </div>
+    <!--class="is-expandable" 추가시 하위메뉴 펼침-->
+    <!--open="" 추가시 펼쳐진 상태가 default-->
+    <nav class="tree-nav" id="folderTreeRespList">
+        <th:block th:each="depth1 : ${folderTreeRespList}">
+            <div class="btn_box">
+                <button type="button" class="btn_sm gray" onclick="orderFolder()">폴더 정렬</button>
+                <button type="button" class="btn_sm gray" onclick="modal_onoff(5,1); docFormList();">양식 정렬</button>
+            </div>
+            <details class="tree-nav__item is-expandable" th:each="depth2 : ${depth1.getChildren()}" th:if="${depth2.typeFolderFlag eq 'Y'}">
+                <summary class="tree-nav__item-title">
+                    <span class="material-symbols-outlined">folder</span>
+                    <span class="ellipsis" th:text="${depth2.typeFolderName}"></span>
+                    <button type="button" class="btn_insert" th:data-name="${depth2.typeFolderName}" th:data-no="${depth2.typeFolderNo}" title="수정하기" th:onclick="udtFolder(this)">
+                        <span class="material-symbols-outlined"> edit_square </span>
+                    </button>
+                    <button type="button" class="btn_delete" title="삭제하기" onclick="deleteFolderBtn(this)" th:value="${depth2.typeFolderNo}">
+                        <span class="material-symbols-outlined"> delete </span>
+                    </button>
+
+                    <!--폴더정렬 버튼 클릭시 하단 div에 display:inline/디폴트 값은 display:none-->
+                    <div class="orderBtn" style="display: none;">
+                        <button title="위로 이동" th:data-no="${depth2.typeFolderNo}" th:data-order-value="${depth2.orderValue}" onclick="upFolderOrderBtn(this)">
+                            <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up" viewBox="0 0 16 16">
+                                <path d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659l4.796-5.48a1a1,0,01,51,.5060l4.7965.48c56..647,.1061.,659,-753.,659H3.,204a1a10,,00,-753-1659z"/>
+                            </svg>-->
+                            <span class="material-symbols-outlined">
+                            expand_circle_up
+                            </span>
+                        </button>
+                        <button title="아래로 이동" th:data-no="${depth2.typeFolderNo}" onclick="downFolderOrderBtn(this)">
+                        <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down" viewBox="0 0 16 16">
+                            <path d="M3.204 5h9.592L8 10.481 3.204 5zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>
+                        </svg>-->
+                        <span class="material-symbols-outlined">
+                            expand_circle_down
+                            </span>
+                        </button>
+                    </div>
+                </summary>
+                <details class="tree-nav__item"  th:each="form : ${depth2.getTypeList()}" th:if="${form.typeFlag == 'Y'}">
+                    <summary class="tree-nav__item-title mg_l25">
+                        <span class="material-symbols-outlined"> news </span>
+                        <span class="ellipsis" th:text="${form.docTypeName}"></span>
+                        <button type="button" class="btn_insert" title="수정하기" th:onclick="'fileClick('+${form.docTypeNo}+')'">
+                    <span class="material-symbols-outlined">
+                      edit_square
+                    </span>
+                        </button>
+                        <button type="button" class="btn_delete" title="삭제하기">
+                            <span class="material-symbols-outlined" th:onclick="'fileDelete('+${form.docTypeNo}+')'"> delete </span>
+                        </button>
+                    </summary>
+                </details>
+            </details>
+        </th:block>
+    </nav>
+</div>
+
+

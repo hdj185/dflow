@@ -1,0 +1,219 @@
+<html lang="ko" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="명령어" name="robots">
+    <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반    대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+    <link href="대표URL" rel="canonical">
+    <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+    <meta content="페이지 설명" name="description">
+    <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+    <meta content="keyword1, keyword2" name="keywords">
+    <!-- 소셜 미디어 공유 -->
+    <meta content="website" property="og:type">
+    <meta content="(주)뎁스" property="og:title">
+    <meta content="(주)뎁스" property="og:description">
+    <meta content="http://www.mysite.com/myimage.jpg" property="og:image">
+    <meta content="http://www.mysite.com" property="og:url">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>(주)뎁스</title>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <link href="/css/common.css" rel="stylesheet">
+    <script src="/js/common.js"></script>
+    <script src="/js/approval/approvalSign.js"></script>
+    <script th:inline="javascript" type="text/javascript">
+        let username = [[${#authentication.principal.nickname}]];
+        let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#header").load("/inc/header.html", function () {
+                // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+                $("#header_user_name").text(username);
+            });
+            $("#topmenu").load("/inc/topmenu.html");
+            $("#leftmenu").load("/inc/leftmenu/leftmenu_approval.html");
+        });
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" integrity="sha512-cyzxRvewl+FOKTtpBzYjW6x6IAYUCZy3sGP40hn+DQkqeluGRCax7qztK2ImL64SA+C7kVWdLI6wvdlStawhyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .modal-contents {
+            padding: 2em;
+        }
+        .img_box {
+            justify-content: center;
+            align-items: center;
+        }
+        .sign_box {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            background: #fff url(/img/IoMdImages.png) no-repeat 50% 50%;
+            background-size: auto;
+        }
+
+        /*.sign_box img {*/
+        /*    position: absolute;*/
+        /*    top: 0;*/
+        /*    left: 0;*/
+        /*    transform: translate(50, 50);*/
+        /*    width: 100%;*/
+        /*    height: 100%;*/
+        /*    object-fit: cover;*/
+        /*    margin: auto;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+    <div id="topmenu"></div>
+    <div class="white_box">
+        <div id="leftmenu"></div>
+        <!--//leftmenu-->
+        <div class="content_box">
+            <p class="con_tit">서명관리</p>
+            <div class="location_box">
+                <span class="material-symbols-outlined"> home </span>
+                <span class="material-symbols-outlined"> navigate_next </span>
+                전자결재
+                <span class="material-symbols-outlined"> navigate_next </span>
+                설정
+                <span class="material-symbols-outlined"> navigate_next </span>
+                <span class="location">서명관리</span>
+            </div>
+            <form action="/aprv/insSignMain" enctype="multipart/form-data" id="saveSignForm" method="post">
+                <div class="img_container">
+                    <div class="img_box" style="display: flex;">
+                        <div class="sign_box">
+                            <img id="img_preview" th:src="${signNo == null ? '' : '/files/images/' + signNo}" th:style="${signNo == null ? 'display: none' : ''}"/>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;width: 70%">
+                        <input accept="image/*" id="img_input" name="signImg" style="display: none" type="file"/>
+                        <button class="btn_md gray" onclick="attachImg()" style="float: left" type="button">
+                            이미지 가져오기
+                        </button>
+                        <div id="modifySignBtnGroup" style="float: right;" th:styleappend="${signNo == null ? 'display: none;' : ''}">
+                            <button class="btn_md gray" id="editSignBtn" type="button" onclick="clickSignEditBtn()">편집</button>
+                            <button class="btn_md gray" id="removeSignBtn" onclick="removeImg()" type="button">삭제</button>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn_md navy logout" id="saveSign_submit" onclick="saveSignBtn()" style="margin-top: 30%; display: none;"
+                                type="button">
+                            <span class="material-symbols-outlined"> task_alt </span>서명등록
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--//content_box-->
+    </div>
+    <!--//white_box-->
+</div>
+<!--//s_container-->
+<!-- 모달 영역 시작 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" integrity="sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<div id="modal_4" class="de-modal">
+    <div class="modal-content modal_w1090">
+              <span class="close" onclick="modal_onoff(4, 2)">
+                <span class="material-symbols-outlined"> close </span>
+              </span>
+        <p class="modal-title">서명 편집</p>
+        <div class="modal-contents">
+            <div style="width: 100%; min-height: 500px; max-height: 800px;">
+                <img id="edit_preview" th:src="${signNo == null ? '' : '/files/images/' + signNo}"
+                     style="width: 100%; height:auto;"
+                     th:styleappend="${signNo == null ? 'display: none' : ''}"/>
+            </div>
+            <div class="btn_al_r">
+                <button type="button" class="btn_md navy" onclick="submitSignEditBtn()">편집</button>
+                <button type="button" class="btn_md gray hv_red" onclick="modal_onoff(4, 2)">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 모달 영역 종료 -->
+<script>
+    let cropper;
+
+    function clickSignEditBtn() {
+        let image = document.querySelector('#edit_preview');
+        cropper = new Cropper(image, {
+            aspectRatio: 1 / 1
+        });
+
+        modal_onoff(4, 1);
+    }
+
+    function submitSignEditBtn() {
+        // if(confirm('서명 편집을 완료하시겠습니까?')) {
+        confirm_pop('서명 편집을 완료하시겠습니까?', function () {
+            const imgInput = document.getElementById("img_input");
+            const inputFile = imgInput.files[0];
+            let fileName = 'cropped_file.png';
+            let fileExtension = 'png';
+            let fileType = 'image/' + fileExtension;
+
+            if (inputFile) {
+                fileName = inputFile.name; // 파일 이름
+                fileExtension = fileName.split('.').pop(); // 파일 확장자
+                fileType = 'image/' + fileExtension;
+
+                // console.log("File Name:", fileName);
+                // console.log("File Extension:", fileExtension);
+            } else {
+                console.log("No file selected.");
+            }
+
+            let canvas = cropper.getCroppedCanvas({
+                width: 170,
+                height: 170,
+                minWidth: 100,
+                minHeight: 100,
+                maxWidth: 170,
+                maxHeight: 170
+            });
+            let imgDataUrl = canvas.toDataURL(fileType);
+            let binaryData = atob(imgDataUrl.split(',')[1]);
+            let array = [];
+            for(let i = 0; i < binaryData.length; i++)
+                array.push(binaryData.charCodeAt(i));
+
+            let file = new File([new Uint8Array(array)], fileName, { type: fileType });
+
+            const formData = new FormData();
+            formData.append('signImg', file, file.name);
+
+            $.ajax({
+                beforeSend: function (xhr) {
+                    /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                    let token = $("meta[name='_csrf']").attr("content");
+                    let header = $("meta[name='_csrf_header']").attr("content");
+                    xhr.setRequestHeader(header, token);
+                },
+                url: "/aprv/insSignMain",
+                enctype : 'multipart/form-data',
+                processData: false,
+                contentType: false,
+                data: formData,
+                type: "POST",
+                success: function (result) {
+                    alert_pop2(1, '서명 편집을 완료하였습니다.', function () { location.reload(); });
+                }, error: function (xhr, status, error) {
+                    console.log("=====통신 실패 ====");
+                    alert_pop(1, error);
+                },
+            });
+        });
+    }
+</script>
+</body>
+</html>

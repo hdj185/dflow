@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="명령어" name="robots"/>
+    <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+    <link href="대표URL" rel="canonical"/>
+    <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+    <meta content="페이지 설명" name="description"/>
+    <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+    <meta content="keyword1, keyword2" name="keywords"/>
+    <!-- 소셜 미디어 공유 -->
+    <meta content="website" property="og:type"/>
+    <meta content="(주)뎁스" property="og:title"/>
+    <meta content="(주)뎁스" property="og:description"/>
+    <meta content="http://www.mysite.com/myimage.jpg" property="og:image"/>
+    <meta content="http://www.mysite.com" property="og:url"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <title>(주)뎁스</title>
+    <link href="/css/login.css" rel="stylesheet"/>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+            rel="stylesheet"
+    />
+
+    <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+            type="text/javascript"
+    >
+    </script>
+    <script>
+        ///////////////////////////사진 첨부 관련///////////////////////////
+        function attachPhoto() {
+            const photoInput = document.getElementById("photo_input");
+            photoInput.click(); // 숨겨진 파일 입력 요소 클릭
+
+            photoInput.addEventListener("change", function () {
+                const photoPreview = document.getElementById("photo_preview");
+                const selectedFile = photoInput.files[0];
+
+                if (selectedFile) {
+                    const objectUrl = URL.createObjectURL(selectedFile);
+                    photoPreview.src = objectUrl;
+                }
+            });
+        }
+    </script>
+    <style>
+        .error {
+            color: #de1629;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+        }
+        .loading span {
+            display: inline-block;
+            color: red;
+            margin: 0 -.05em;
+            animation: loading 1.4s infinite alternate;
+        }
+        loading span:nth-child(2) {
+            animation-delay: .1s;
+        }
+        loading span:nth-child(3) {
+            animation-delay: .2s;
+        }
+        loading span:nth-child(4) {
+            animation-delay: .3s;
+        }
+        loading span:nth-child(5) {
+            animation-delay: .4s;
+        }
+        loading span:nth-child(6) {
+            animation-delay: .5s;
+        }
+        @keyframes loading {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login_wrap">
+    <p class="slogan">Welcome to <br/>DEPS!</p>
+    <div class="login_box">
+        <p class="t_logo"><img alt="주식회사 DEPS" src="/img/logo.png"/></p>
+        <form action="/auth/login" id="loginForm" method="post">
+            <p class="error" th:if="${loginErrorMsg}" th:text="${loginErrorMsg}"></p>
+            <ul>
+                <li>
+                    <label for="login_id">ID</label>
+                    <input
+                            id="login_id"
+                            name="memberId"
+                            placeholder="아이디를 입력해주세요."
+                            required=""
+                            type="text"
+                    />
+                </li>
+                <li>
+                    <label for="login_pw">PW</label>
+                    <input
+                            id="login_pw"
+                            name="password"
+                            placeholder="비밀번호를 입력해주세요."
+                            required=""
+                            type="password"
+                    />
+                </li>
+            </ul>
+            <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+        </form>
+        <div class="login_bot">
+            <!--modal button-->
+            <div class="btn_box">
+                <button onclick="modal_onoff(1, 1)" type="button">회원가입</button>
+                <button onclick="modal_onoff(6, 1)" type="button">비밀번호 재설정</button>
+            </div>
+        </div>
+        <button class="btn_login" form="loginForm" type="submit" onclick="checkLogin()">
+            로그인
+        </button>
+        <button class="btn_privacy" type="button" onclick="alert_pop(1, '개인정보 처리방침 test')">개인정보 처리방침</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="de-modal" id="modal_1">
+        <div class="modal-content modal_w1090">
+          <span class="close" onclick="resetForm()">
+            <span class="material-symbols-outlined"> close </span>
+          </span>
+            <p class="modal-title">회원가입</p>
+            <form action="/auth/join" enctype="multipart/form-data" id="registrationForm" method="post">
+                <div class="member_join">
+                    <div class="user_photo">
+                        <div class="photo_box">
+                            <img id="photo_preview"/>
+                        </div>
+                        <input accept="image/*" id="photo_input" name="memberImg" style="display: none" type="file"/>
+                        <button class="btn_file" onclick="attachPhoto()" type="button">사진 첨부</button>
+                    </div>
+                    <div class="user_info">
+                        <ul>
+                            <li>
+                                <label for="member_id"><span>*</span>ID</label>
+                                <input
+                                        id="member_id"
+                                        name="memberId"
+                                        placeholder="아이디 입력 (10자 이내)"
+                                        required
+                                        type="text"
+                                />
+                            </li>
+                            <li>
+                                <label for="member_pw"><span>*</span>PW</label>
+                                <input
+                                        id="member_pw"
+                                        name="memberPw"
+                                        placeholder="비밀번호 입력 (영문, 숫자 포함 20자 이내)"
+                                        required
+                                        type="password"
+                                />
+                            </li>
+                            <li>
+                                <label for="member_name_kr"><span>*</span>한글이름</label>
+                                <input id="member_name_kr" name="memberNameKr" placeholder="ex &#41; 홍길동" required
+                                       type="text"/>
+                            </li>
+                            <li>
+                                <label for="member_birthdate"><span>*</span>생년월일</label>
+                                <input id="member_birthdate" name="memberBirthdate" placeholder="ex &#41; 2000-05-05"
+                                       required type="date"/>
+                            </li>
+                            <li>
+                                <label for="member_name_cn">한문이름</label>
+                                <input id="member_name_cn" name="memberNameCn" placeholder="ex &#41; 洪吉同"
+                                       type="text"/>
+                            </li>
+                            <li>
+                                <label for="member_phone"><span>*</span>연락처</label>
+                                <input
+                                        id="member_phone"
+                                        name="memberPhone"
+                                        placeholder="ex &#41; 010-1234-5678"
+                                        required
+                                        type="text"
+                                />
+                            </li>
+                            <li>
+                                <label for="member_name_en">영문이름</label>
+                                <input
+                                        id="member_name_en"
+                                        name="memberNameEn"
+                                        placeholder="ex &#41; Hong gil dong"
+                                        type="text"
+                                />
+                            </li>
+                            <li>
+                                <label for="member_email"><span>*</span>이메일</label>
+                                <input
+                                        id="member_email"
+                                        name="memberEmail"
+                                        placeholder="ex &#41; gildong@deps.kr"
+                                        type="text"
+                                />
+                            </li>
+                            <li class="w100">
+                                <label for="member_address">주소</label>
+                                <input
+                                        id="member_address"
+                                        name="memberAddress"
+                                        placeholder="주소 입력 (50자 이내)"
+                                        type="text"
+                                />
+                            </li>
+                            <li>
+                                <label for="department"><span>*</span>부서</label>
+                                <div
+                                        class="select_mate"
+                                        data-mate-select="active"
+                                        style="width: 294px"
+                                >
+                                    <select id="department" name="departmentNo" onchange="" onclick="return false;"
+                                            required>
+                                        <option value="">선택</option>
+                                        <option th:each="dept : ${deptList}" th:text="${dept.departmentName}"
+                                                th:value="${dept.departmentNo}">부서
+                                        </option>
+                                    </select>
+                                    <p
+                                            class="selecionado_opcion"
+                                            onclick="open_select(this)"
+                                    ></p>
+                                    <span class="icon_select_mate" onclick="open_select(this)">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                                    <div class="cont_list_select_mate">
+                                        <ul class="cont_select_int"></ul>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <label for="staff"><span>*</span>직책</label>
+                                <div
+                                        class="select_mate"
+                                        data-mate-select="active"
+                                        style="width: 294px"
+                                >
+                                    <select id="staff" name="staffNo" onchange="" onclick="return false;" required>
+                                        <option value="">선택</option>
+                                        <option th:each="stf : ${stfList}" th:text="${stf.staffName}"
+                                                th:value="${stf.staffNo}">직책
+                                        </option>
+                                    </select>
+                                    <p
+                                            class="selecionado_opcion"
+                                            onclick="open_select(this)"
+                                    ></p>
+                                    <span class="icon_select_mate" onclick="open_select(this)">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                                    <div class="cont_list_select_mate">
+                                        <ul class="cont_select_int"></ul>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <label for="member_enable_date"><span>*</span>입사일</label>
+                                <input id="member_enable_date" name="memberEnableDate" required type="date"/>
+                            </li>
+                            <li>
+                                <label for="member_leave_date">퇴사일</label>
+                                <input disabled id="member_leave_date" name="memberLeaveDate" type="date"/>
+                            </li>
+                            <li>
+                                <label for="member_gender"><span>*</span>성별</label>
+                                <div
+                                        class="select_mate"
+                                        data-mate-select="active"
+                                        style="width: 294px"
+                                >
+                                    <select id="member_gender" name="memberGender" onchange="" onclick="return false;"
+                                            required>
+                                        <option value="">선택</option>
+                                        <option value="남">남</option>
+                                        <option value="여">여</option>
+                                    </select>
+                                    <p
+                                            class="selecionado_opcion"
+                                            onclick="open_select(this)"
+                                    ></p>
+                                    <span class="icon_select_mate" onclick="open_select(this)">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                                    <div class="cont_list_select_mate">
+                                        <ul class="cont_select_int"></ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="btn_al_r">
+                            <button class="btn_cancel" onclick="resetForm()" type="button">취소</button>
+                            <button class="btn_join" id="join_submit" onclick="registerForm()" type="button">가입</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- //Modal -->
+
+    <!-- 임시 비밀번호 전송 -->
+    <div class="de-modal" id="modal_6">
+        <div class="modal-content modal_w500">
+        <span class="close" onclick="modal_onoff(6, 2)">
+            <span class="material-symbols-outlined"> close </span>
+        </span>
+            <p class="modal-title">임시 비밀번호 전송</p>
+            <br>
+
+            <div class="tempPwForm">
+                <form role="form">
+                    <div class="regMemberId">
+                        <label for="reg-member-id" style="font-weight: bold">아이디</label>
+                        <input class="regMemberIdInput" id="reg-member-id" placeholder="가입시 등록한 아이디를 입력하세요."
+                               name="memberId" type="text">
+                    </div>
+                    <br>
+                    <div class="regEmail">
+                        <label for="reg-email" style="font-weight: bold">이메일 주소</label>
+                        <input class="regEmailInput" id="reg-email" placeholder="가입시 등록한 이메일을 입력하세요."
+                               name="memberEmail" type="email">
+                    </div>
+                    <br>
+                    <div class="regName">
+                        <label for="reg-name" style="font-weight: bold">이름</label>
+                        <input class="regNameInput" id="reg-name" placeholder="가입 시 등록한 이름을 입력하세요."
+                               name="memberNameKr" type="text">
+                    </div>
+                </form>
+                <br>
+                <div class="loading">
+                    <span>전</span>
+                    <span>송</span>
+                    <span>중</span>
+                    <span>.</span>
+                    <span>.</span>
+                    <span>.</span>
+                </div>
+                <div class="sendEmailBtn">
+                    <!--                <button class="btn bg-gradient-primary" id="pwUpdate" onclick="pwUpdate()"-->
+                    <!--                        value="비밀번호 변경">비밀번호 변경-->
+                    <!--                </button>-->
+                    <button class="btn_md navy logout" id="sendEmailBtn" type="button" value="임시 비밀번호 전송">
+                        임시 비밀번호 전송
+                    </button>
+                </div>
+                <br>
+            </div>
+        </div>
+        <!-- //Modal_6 -->
+    </div>
+    <!--alert sample-->
+    <div class="alert_wrap" id="alert_wrap" style="display: none;">
+        <p><span class="material-symbols-outlined">
+            release_alert
+        </span> <span id="alert_span">입력하신 정보와 일치하지 않습니다.</span></p>
+        <div class="alert_btn_box">
+            <button type="button" onclick="alert_pop(2, '')">확인</button>
+        </div>
+    </div>
+    <!--alert sample-->
+    <script src="/js/alert_handler.js"></script>
+</div>
+</body>
+
+<script src="/js/common.js"></script>
+<script>
+    function removeAllListItems() {
+        let div_cont_select = document.querySelectorAll(
+            "[data-mate-select='active']"
+        );
+
+        for (let e = 0; e < div_cont_select.length; e++) {
+            div_cont_select[e].setAttribute("data-indx-select", e);
+            div_cont_select[e].setAttribute("data-selec-open", "false");
+            let ul_cont = document.querySelectorAll(
+                "[data-indx-select='" + e + "'] > .cont_list_select_mate > ul"
+            );
+
+            ul_cont.forEach(ul => {
+                ul.innerHTML = ''; // Removes all li elements inside ul
+            });
+        }
+    }
+
+    function resetForm() {
+        modal_onoff(1, 2);
+        document.getElementById('member_id').value = "";
+        document.getElementById('member_pw').value = "";
+        document.getElementById('member_name_kr').value = "";
+        document.getElementById('member_birthdate').value = "";
+        document.getElementById('member_name_cn').value = "";
+        document.getElementById('member_phone').value = "";
+        document.getElementById('member_name_en').value = "";
+        document.getElementById('member_email').value = "";
+        document.getElementById('member_address').value = "";
+        document.getElementById('department').options[0].selected = true;
+        document.getElementById('staff').options[0].selected = true;
+        document.getElementById('member_enable_date').value = "";
+        document.getElementById('member_leave_date').value = "";
+        document.getElementById('member_gender').options[0].selected = true;
+        document.getElementById('photo_input').value = "";
+        document.getElementById('photo_preview').src = "";
+        removeAllListItems();
+        crear_select();
+    }
+
+
+    // 회원가입
+    function registerForm() {
+        console.log("들어옴");
+        let form = document.getElementById("registrationForm");
+        let data = new FormData(form);
+
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
+        // Set up request
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", form.action, true);
+        xhr.setRequestHeader(header, token);
+
+        // Handle response
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // Handle successful response
+                console.log("회원가입 성공");
+                alert_pop(1, xhr.responseText);
+                // alert(xhr.responseText);
+                resetForm();
+            } else {
+                // Handle error response
+                const msg = xhr.responseText ? xhr.responseText : "회원가입에 실패했습니다.";
+                alert_pop(1, msg);
+                console.error(msg);
+                // alert(xhr.responseText || "회원 가입에 실패했습니다.");
+            }
+        };
+
+        xhr.onerror = function () {
+            // Handle error
+            alert_pop(1, "에러가 발생했습니다.");
+            console.error("회원가입 실패");
+        };
+
+        // Send the request
+        xhr.send(data);
+    }
+
+
+    // 임시 비밀번호 전송 함수
+    function sendTemporaryPassword() {
+
+        showLoading();
+
+        const memberId = document.getElementById('reg-member-id').value;
+        const memberEmail = document.getElementById('reg-email').value;
+        const memberNameKr = document.getElementById('reg-name').value;
+
+        if (!memberId || !memberEmail || !memberNameKr) {
+            alert_pop(1, '모든 필드를 입력해주세요.');
+            return;
+        }
+
+        const data = {
+            memberId: memberId,
+            memberEmail: memberEmail,
+            memberNameKr: memberNameKr
+        };
+
+        const url = "/auth/confirmInfo";
+
+        $.ajax({
+            beforeSend: function (xhr) {
+                let token = $("meta[name='_csrf']").attr("content");
+                let header = $("meta[name='_csrf_header']").attr("content");
+                xhr.setRequestHeader(header, token);
+            },
+            type: "POST",
+            url: url,
+            data: JSON.stringify(data),
+            contentType: "application/json;charset=UTF-8",
+            success: function (response) {
+                console.log(response)
+
+                if (response.check) {
+                    sendTemporaryPasswordEmail(memberId, memberEmail, memberNameKr);
+                } else {
+                    alert_pop(1, '일치하는 정보가 없습니다.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('에러 발생:', error);
+                alert_pop(1, '임시 비밀번호 전송 중 오류가 발생했습니다.');
+            }
+        });
+    }
+
+    function sendTemporaryPasswordEmail(memberId, memberEmail, memberNameKr) {
+        const url = "/auth/sendEmail";
+
+        console.log(memberId, memberEmail, memberNameKr);
+
+        // 데이터를 JSON 형식으로 변환
+        const requestData = JSON.stringify({
+            memberId: memberId,
+            memberEmail: memberEmail,
+            memberNameKr: memberNameKr
+        });
+
+        $.ajax({
+            beforeSend: function (xhr) {
+                let token = $("meta[name='_csrf']").attr("content");
+                let header = $("meta[name='_csrf_header']").attr("content");
+                xhr.setRequestHeader(header, token);
+            },
+            type: "POST",
+            url: url,
+            data: requestData, // JSON  데이터를 요청 본문에 포함
+            contentType: "application/json", // 요청 본문의 컨텐츠 타입을 JSON으로 설정
+            success: function (response) {
+                alert_pop(1, '임시 비밀번호 이메일이 성공적으로 전송되었습니다.');
+                modal_onoff(6,2);
+            },
+            error: function (xhr, status, error) {
+                console.error('에러 발생:', error);
+                alert_pop(1, '임시 비밀번호 이메일 전송 중 오류가 발생했습니다.');
+            },
+            complete: function () {
+                // Ajax 요청이 완료되면 로딩 표시를 숨깁니다.
+                hideLoading();
+            }
+        });
+    }
+
+    // 로딩 표시를 보여주는 함수
+    function showLoading() {
+        const loading = document.querySelector('.loading');
+        loading.style.display = 'block';
+    }
+
+    // 로딩 표시를 숨기는 함수
+    function hideLoading() {
+        const loading = document.querySelector('.loading');
+        loading.style.display = 'none';
+    }
+
+    document.getElementById('sendEmailBtn').addEventListener('click', sendTemporaryPassword);
+
+function checkLogin(){
+
+
+}
+
+</script>
+</html>

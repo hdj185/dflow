@@ -1,0 +1,48 @@
+#docContent {
+    width: 1200px;
+    height: 700px;
+    margin: 0 auto;
+}
+.doc_box {
+    border: solid 1px #c1c8e4;
+    padding: 30px;
+    margin: 50px 0;
+    text-align: center;
+    overflow-y: auto;
+}
+.print-modal-body {
+    padding: 20px 30px;
+}
+.doc_box::-webkit-scrollbar {
+    width: 15px;
+}
+.doc_box::-webkit-scrollbar-thumb {
+    background-color: #0a1032;
+    border-radius: 7px;
+}
+.doc_box::-webkit-scrollbar-track {
+    background-color: #c1c8e4;
+    border-radius: 7px;
+}
+
+.print-div {
+    display: none;
+}
+
+@media print {
+    .print-div {
+        display: block;
+    }
+}
+
+/* 기본 링크 스타일 */
+.file_tit a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: #29518d; /* 링크 색상 설정 */
+}
+
+/* 호버 시 스타일 */
+.file_tit a:hover {
+    text-decoration: underline; /* 호버 시 밑줄 추가 */
+    color: #6ad2ff; /* 링크 색상 설정 */
+}

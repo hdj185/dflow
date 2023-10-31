@@ -1,0 +1,279 @@
+<html lang="ko" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="명령어" name="robots">
+    <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+    <link href="대표URL" rel="canonical">
+    <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+    <meta content="페이지 설명" name="description">
+    <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+    <meta content="keyword1, keyword2" name="keywords">
+    <!-- 소셜 미디어 공유 -->
+    <meta content="website" property="og:type">
+    <meta content="(주)뎁스" property="og:title">
+    <meta content="(주)뎁스" property="og:description">
+    <meta content="http://www.mysite.com/myimage.jpg" property="og:image">
+    <meta content="http://www.mysite.com" property="og:url">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>(주)뎁스</title>
+    <link href="/css/common.css" rel="stylesheet">
+    <script src="/js/common.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script th:inline="javascript" type="text/javascript">
+        let username = [[${#authentication.principal.nickname}]];
+        let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#header").load("/inc/header.html", function () {
+                // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+                $("#header_user_name").text(username);
+            });
+            $("#topmenu").load("/inc/topmenu_admin.html");
+            $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_system.html");
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+          rel="stylesheet">
+    <style>
+        .auto-search:hover {
+            font-weight: bolder;
+            color: navy;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+    <div id="topmenu"></div>
+    <div class="white_box">
+        <div id="leftmenu"></div>
+        <!--//leftmenu-->
+        <div class="content_box">
+            <p class="con_tit">로그 관리</p>
+            <div class="location_box">
+                <span class="material-symbols-outlined"> home </span>
+                <span class="material-symbols-outlined"> navigate_next </span>
+                시스템관리
+                <span class="material-symbols-outlined"> navigate_next </span>
+                <span class="location">로그 관리</span>
+            </div>
+
+            <form id="logForm" method="get" th:action="@{/admin/system/selLog}">
+                <div class="table_top">
+                    <div class="tb_right">
+                        <span class="sb_txt">검색기간</span>
+                        <label for="date_choice1"></label>
+                        <input type="date" id="date_choice1" name="startDate" class="date_choice" onchange="validateDate()"
+                               th:value="${searchList.startDate != null ? #temporals.format(searchList.startDate, 'yyyy-MM-dd') : ''}"/>
+                        <label for="date_choice2"></label>
+                        <input type="date" class="date_choice" id="date_choice2" name="endDate" onchange="validateDate()"
+                               th:value="${searchList.endDate != null ? #temporals.format(searchList.endDate, 'yyyy-MM-dd') : ''}"/>
+                        <span class="sb_txt" style="margin-left: 20px;">로그 타입</span>
+                        <div
+                                class="select_mate"
+                                data-mate-select="active"
+                                style="width: 130px"
+                        >
+                            <select id="activityType" name="activityType" onchange="" onclick="return false;" style="">
+                                <option disabled selected value="">선택</option>
+                                <option th:each="type : ${typeCodes}"
+                                        th:selected="${searchList.activityType == type.codeName}"
+                                        th:text="${type.codeAccount}"
+                                        th:value="${type.codeName}"></option>
+                            </select>
+                            <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                            <span class="icon_select_mate" onclick="open_select(this)" style="cursor: pointer">
+                <span class="material-symbols-outlined">
+                  keyboard_arrow_down
+                </span>
+              </span>
+                            <div class="cont_list_select_mate">
+                                <ul class="cont_select_int"></ul>
+                            </div>
+                        </div>
+
+                        <span class="sb_txt" style="margin-left: 20px;">검색 조건</span>
+                        <div
+                                class="select_mate"
+                                data-mate-select="active"
+                                style="width: 130px"
+                        >
+                            <select name="keywordType" id="keywordType" onchange="" onclick="return false;">
+                                <option disabled selected value="">선택</option>
+                                <option th:selected="${searchList.keywordType == '아이디'}" value="아이디">아이디
+                                </option>
+                                <option th:selected="${searchList.keywordType == '클라이언트 IP'}" value="클라이언트 IP">클라이언트 IP</option>
+                            </select>
+                            <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                            <span class="icon_select_mate" onclick="open_select(this)" style="cursor: pointer">
+                <span class="material-symbols-outlined">
+                  keyboard_arrow_down
+                </span>
+              </span>
+                            <div class="cont_list_select_mate">
+                                <ul class="cont_select_int"></ul>
+                            </div>
+                        </div>
+                        <input class="search_txt" id="search_keyword" name="keyword" th:value="${searchList.keyword}" placeholder="검색어를 입력해주세요." type="text"/>
+                        <button class="btn_md navy" style="margin-left: 5px;" title="검색" type="submit" onclick="return validateSearchOp()">검색</button>
+                    </div>
+                </div>
+            </form>
+
+            <!--//table_top-->
+            <table class="tb_st1" summary="">
+                <caption></caption>
+                <colgroup>
+                    <col width="5%">
+                    <col width="10%">
+                    <col width="10%">
+                    <col width="15%">
+                    <col width="15%">
+                    <col width="20%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>아이디</th>
+                    <th>로그 타입</th>
+                    <th>시간</th>
+                    <th>클라이언트 IP</th>
+                    <th>접속환경</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${logList}">
+                    <td th:text="${log.logNo}">순번</td>
+                    <td><span class="auto-search" onclick="setSearchValue(this, '아이디')" th:text="${log.memberId}" style="cursor: pointer;">아이디</span></td>
+                    <td th:text="${log.activityType == 'LOGIN' ? '로그인' : '로그아웃'}">로그타입</td>
+                    <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">시간</td>
+                    <td><span class="auto-search" onclick="setSearchValue(this, '클라이언트 IP')" th:text="${log.clientIp}" style="cursor: pointer;">ip</span></td>
+                    <td th:text="${log.userAgent}">접속환경</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(logList)}">
+                    <td colspan="8">로그 기록이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="pagination" id="pagination">
+                <ul>
+                    <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+                        <a class="start_page"
+                           th:href="@{/admin/system/selLog(page=${pageInfo.startPage}, startDate=${searchList.startDate != null ? searchList.startDate.toString().split('T')[0] : ''}, endDate=${searchList.endDate != null ? searchList.endDate.toString().split('T')[0] : ''}, activityType=${searchList.activityType}, keywordType=${searchList.keywordType}, keyword=${searchList.keyword}, pageSize=${pageSize})}"
+                           title="처음페이지">
+                            <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                        </a>
+                    </li>
+                    <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+                        <a class="pre_page"
+                           th:href="@{/admin/system/selLog(page=${pageInfo.nowPage - 1}, startDate=${searchList.startDate != null ? searchList.startDate.toString().split('T')[0] : ''}, endDate=${searchList.endDate != null ? searchList.endDate.toString().split('T')[0] : ''}, activityType=${searchList.activityType}, keywordType=${searchList.keywordType}, keyword=${searchList.keyword}, pageSize=${pageSize})}"
+                           title="이전페이지">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </a>
+                    </li>
+                    <li th:each="page : ${#numbers.sequence(pageInfo.firstPage, pageInfo.lastPage)}"
+                        th:if="${pageInfo.lastPage > 0}">
+                        <a th:classappend="${page == pageInfo.nowPage} ? 'present'"
+                           th:href="@{/admin/system/selLog(page=${page}, startDate=${searchList.startDate != null ? searchList.startDate.toString().split('T')[0] : ''}, endDate=${searchList.endDate != null ? searchList.endDate.toString().split('T')[0] : ''}, activityType=${searchList.activityType}, keywordType=${searchList.keywordType}, keyword=${searchList.keyword}, pageSize=${pageSize})}"
+                           th:text="${page}">3</a>
+                    </li>
+                    <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+                        <a class="next_page"
+                           th:href="@{/admin/system/selLog(page=${pageInfo.nowPage + 1}, startDate=${searchList.startDate != null ? searchList.startDate.toString().split('T')[0] : ''}, endDate=${searchList.endDate != null ? searchList.endDate.toString().split('T')[0] : ''}, activityType=${searchList.activityType}, keywordType=${searchList.keywordType}, keyword=${searchList.keyword}, pageSize=${pageSize})}"
+                           title="다음페이지">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </a>
+                    </li>
+                    <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+                        <a class="end_page"
+                           th:href="@{/admin/system/selLog(page=${pageInfo.endPage}, startDate=${searchList.startDate != null ? searchList.startDate.toString().split('T')[0] : ''}, endDate=${searchList.endDate != null ? searchList.endDate.toString().split('T')[0] : ''}, activityType=${searchList.activityType}, keywordType=${searchList.keywordType}, keyword=${searchList.keyword}, pageSize=${pageSize})}"
+                           title="끝페이지">
+                            <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--//content_box-->
+    </div>
+    <!--//white_box-->
+</div>
+<!--//s_container-->
+
+<script>
+    function validateSearchOp() {
+        let startDateField = document.getElementById('date_choice1');
+        let endDateField = document.getElementById('date_choice2');
+        let keywordType = document.getElementById('keywordType').value;
+        let activityType = document.getElementById('activityType').value;
+        let searchTxt = document.getElementById('search_keyword').value;
+
+        let startDate = startDateField.value;
+        let endDate = endDateField.value;
+
+        if (activityType == "" && keywordType == "" && searchTxt.trim() == "" && (startDate == "" || endDate == "")) {
+            alert_pop(1, "검색 조건을 선택하세요.");
+            return false;
+        }
+
+        if (keywordType != "" && searchTxt.trim() == "") {
+            alert_pop(1, "검색어를 입력하세요.");
+            return false;
+        }
+
+        if (startDate && endDate && startDate > endDate) {
+            alert_pop(1, "시작 날짜는 종료 날짜보다 뒤에 올 수 없습니다.");
+            startDateField.value = "";
+            endDateField.value = "";
+            return false;
+        }
+
+        return true;
+    }
+
+    // 선택 시 검색창에 자동 입력
+    function setSearchValue(element, condition) {
+        let searchKeyword = document.getElementById('search_keyword');
+        searchKeyword.value = element.innerText;
+
+        let keywordType = document.getElementById('keywordType');
+
+        for (let i = 0; i < keywordType.options.length; i++) {
+            if (keywordType.options[i].value == condition) {
+                keywordType.selectedIndex = i;
+                break;
+            }
+        }
+
+        // 폼 제출
+        document.getElementById('logForm').submit();
+    }
+
+    // 검색조건 초기화
+    function resetSearch() {
+        // 유효성 검사를 통과하지 못하면 초기화하지 않음
+        if (!validateSearchOp()) {
+            return false;
+        }
+
+        // 선택한 검색 조건 초기화
+        document.getElementById('keywordType').selectedIndex = 0;
+        document.getElementById('keywordType').selectedIndex = 0;
+        document.getElementById('activityType').selectedIndex = 0;
+
+        // 입력한 검색값 초기화
+        document.getElementById('date_choice1').value = '';
+        document.getElementById('date_choice2').value = '';
+        document.getElementById('search_keyword').value = '';
+
+        return true;
+    }
+
+</script>
+</body>
+</html>

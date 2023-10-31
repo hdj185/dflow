@@ -1,0 +1,10 @@
+<th:block th:each="fileList : ${fileList}">
+  <li class="fileLi">
+    <span class="file_tit" th:text="${fileList.fileOriginName}"></span>
+    <button type="button" class="btn_del" title="삭제하기" style="margin-left: 5px" th:onclick="'removeFile(event,'+${fileList.referenceFileNo}+')'">
+                        <span class="material-symbols-outlined">
+                            close
+                        </span>
+    </button>
+  </li>
+</th:block>

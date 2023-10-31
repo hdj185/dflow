@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#header").load("/inc/header.html");
+      $("#topmenu").load("/inc/topmenu.html");
+    });
+  </script>
+  <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+  />
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu"></div>
+  <div class="white_box">
+    <div class="organization">
+      <ul>
+        <li>
+          <p class="depth1 active">
+            <a href=""
+            >DEPS<span class="material-symbols-outlined">
+                    expand_less
+                  </span></a
+            >
+          </p>
+          <ul>
+            <li>
+              <p class="depth2 active">
+                <a href="">
+                  개발본부
+                  <span class="material-symbols-outlined">
+                        expand_less
+                      </span></a
+                >
+              </p>
+              <ul class="depth3">
+                <li class=""><a href="">사업관리팀</a></li>
+                <li><a href="">디자인팀</a></li>
+                <li><a href="">개발1팀</a></li>
+                <li><a href="">개발2팀</a></li>
+                <li><a href="">개발3팀</a></li>
+                <li><a href="">하드웨어팀</a></li>
+              </ul>
+            </li>
+            <li class="depth2"><a href="">기획본부</a></li>
+            <li class="depth2"><a href="">영업본부</a></li>
+            <li class="depth2"><a href="">경영본부</a></li>
+            <li class="depth2"><a href="">기술연구소</a></li>
+          </ul>
+        </li>
+        <li>
+          <p class="depth0">
+            <a href="">임시부서</a>
+          </p>
+        </li>
+      </ul>
+    </div>
+    <!--//leftmenu-->
+    <div class="content_box">
+      <p class="con_tit">조직도</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        조직도
+      </div>
+      <div class="search_top">
+        <button type="button" class="btn_md_img navy excel">
+          엑셀 다운로드
+        </button>
+        <div class="search_right">
+          <div
+                  class="select_mate"
+                  data-mate-select="active"
+                  style="width: 80px"
+          >
+            <select name="" onchange="" onclick="return false;" id="">
+              <option value="1">이름</option>
+              <option value="2">연락처</option>
+            </select>
+            <p class="selecionado_opcion" onclick="open_select(this)"></p>
+            <span onclick="open_select(this)" class="icon_select_mate">
+                  <span class="material-symbols-outlined">
+                    keyboard_arrow_down
+                  </span>
+                </span>
+            <div class="cont_list_select_mate">
+              <ul class="cont_select_int"></ul>
+            </div>
+          </div>
+          <input
+                  type="text"
+                  id="search_txt"
+                  class="search_txt"
+                  placeholder="검색어를 입력해주세요."
+          />
+          <button type="button" title="검색" class="btn_search">
+            검색
+          </button>
+        </div>
+      </div>
+
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+</body>
+</html>

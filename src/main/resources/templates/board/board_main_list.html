@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html
+  lang="ko"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="명령어" />
+    <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+    <link rel="canonical" href="대표URL" />
+    <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+    <meta name="description" content="페이지 설명" />
+    <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+    <meta name="keywords" content="keyword1, keyword2" />
+    <!-- 소셜 미디어 공유 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="(주)뎁스" />
+    <meta property="og:description" content="(주)뎁스" />
+    <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+    <meta property="og:url" content="http://www.mysite.com" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title>(주)뎁스</title>
+    <link href="/css/common.css" rel="stylesheet" />
+    <script src="/js/common.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+      let username = [[${#authentication.principal.nickname}]];
+      let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#header").load("/inc/header.html", function () {
+          // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+          $("#header_user_name").text(username);
+        });
+        $("#leftmenu").load("/inc/leftmenu/leftmenu_board.html");
+        $("#topmenu").load("/inc/topmenu.html");
+      });
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+    />
+  </head>
+  <body>
+    <div id="header"></div>
+    <div class="s_container">
+      <div id="topmenu"></div>
+      <div class="white_box">
+        <div id="leftmenu"></div>
+        <!--//leftmenu-->
+        <div class="content_box">
+          <p class="con_tit">개선요청사항</p>
+          <div class="location_box">
+            <span class="material-symbols-outlined"> home </span>
+            <span class="material-symbols-outlined"> navigate_next </span>
+            게시판
+            <span class="material-symbols-outlined"> navigate_next </span>
+            개선요청사항
+          </div>
+          <!--//search_box-->
+          <div class="table_top">
+            <div class="tb_left">
+              총 <span th:text="${pageResp.getTotal()}"></span>건
+            </div>
+            <div class="tb_right">
+              <form id="fileForm" th:action="@{/board/selBoard}" method="get">
+                <div
+                  class="select_mate"
+                  data-mate-select="active"
+                  style="width: 145px"
+                >
+                  <select
+                    name="type"
+                    onchange=""
+                    onclick="return false;"
+                    id="searchType"
+                  >
+                    <option
+                      value="tcw"
+                      th:selected="${brdNoticePageReq.type== 'tcw'}"
+                    >
+                      전체
+                    </option>
+                    <option
+                      value="t"
+                      th:selected="${brdNoticePageReq.type == 't'}"
+                    >
+                      제목
+                    </option>
+                    <option
+                      value="c"
+                      th:selected="${brdNoticePageReq.type == 'c'}"
+                    >
+                      내용
+                    </option>
+                    <option
+                      value="tc"
+                      th:selected="${brdNoticePageReq.type == 'tc'}"
+                    >
+                      제목+내용
+                    </option>
+                    <option
+                      value="w"
+                      th:selected="${brdNoticePageReq.type == 'w'}"
+                    >
+                      작성자
+                    </option>
+                  </select>
+                  <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                  <span onclick="open_select(this)" class="icon_select_mate">
+                    <span class="material-symbols-outlined"
+                      >keyboard_arrow_down</span
+                    >
+                  </span>
+                  <div class="cont_list_select_mate">
+                    <ul class="cont_select_int"></ul>
+                  </div>
+                </div>
+                <label for="search_txt"></label>
+                <input
+                  type="text"
+                  id="search_txt"
+                  name="keyword"
+                  class="search_txt"
+                  placeholder="검색어를 입력해주세요."
+                  th:value="${brdNoticePageReq.keyword}"
+                />
+                <input
+                  type="hidden"
+                  name="size"
+                  th:value="${brdNoticePageReq.size}"
+                />
+                <button type="submit" title="검색" class="btn_search">
+                  검색
+                </button>
+              </form>
+            </div>
+          </div>
+          <!--//table_top-->
+          <table class="tb_st1" summary="">
+            <caption></caption>
+            <colgroup>
+              <col width="10%" />
+              <col width="*%" />
+              <col width="13%" />
+              <col width="20%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+              </tr>
+            </thead>
+            <tbody th:with="link = ${brdNoticePageReq.getLink}">
+              <tr
+                style="cursor: pointer"
+                th:if="${pageResp.total > 0}"
+                th:attr="onclick='showBoardDetail (' + ${pages.getBoardNo()} + ',2)'"
+                th:each="pages, index : ${pageResp.getPageResponseList()}"
+              >
+                <!--          <td th:text="${pages.getBoardNo()}"></td>-->
+                <td
+                  th:text="${pageResp.total - pageResp.getSize() * (pageResp.getPage() - 1) - index.getIndex()}"
+                ></td>
+                <td style="text-align: left">
+                  <span th:text="${pages.getBoardTitle()}"></span>
+                </td>
+                <td th:text="${pages.getWrtName()}"></td>
+                <td
+                  th:text="${#temporals.format(pages.getCreateDate(), 'yyyy-MM-dd HH:mm:ss')}"
+                ></td>
+              </tr>
+              <tr th:if="${pageResp.total  == 0}">
+                <td colspan="10" style="text-align: center;">게시글이 없습니다.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination" th:if="${pageResp.total > 0}">
+            <ul>
+              <li>
+                <a
+                  href="#"
+                  class="start_page"
+                  title="처음페이지"
+                  data-num="1"
+                  onclick="pageClick(event)"
+                >
+                  <span class="material-symbols-outlined" data-num="1"
+                    >keyboard_double_arrow_left</span
+                  >
+                </a>
+              </li>
+              <li th:if="${pageResp.prev}">
+                <a
+                  class="pre_page"
+                  title="이전페이지"
+                  th:data-num="${pageResp.start -1}"
+                  onclick="pageClick(event)"
+                >
+                  <span
+                    class="material-symbols-outlined"
+                    th:data-num="${pageResp.start -1}"
+                    >chevron_left</span
+                  >
+                </a>
+              </li>
+              <th:block
+                th:each="i: ${#numbers.sequence(pageResp.start, pageResp.end)}"
+              >
+                <li>
+                  <a
+                    th:class="${pageResp.page == i}? 'present' : ''"
+                    th:data-num="${i}"
+                    onclick="pageClick(event)"
+                    >[[${i}]]</a
+                  >
+                </li>
+              </th:block>
+              <li th:if="${pageResp.next}">
+                <a
+                  class="next_page"
+                  title="다음페이지"
+                  th:data-num="${pageResp.end +1}"
+                  onclick="pageClick(event)"
+                >
+                  <span
+                    class="material-symbols-outlined"
+                    th:data-num="${pageResp.end +1}"
+                    >chevron_right</span
+                  >
+                </a>
+              </li>
+              <li>
+                <a class="end_page" title="끝페이지" onclick="pageClick(event)">
+                  <span
+                    class="material-symbols-outlined"
+                    th:data-num="${pageResp.last}"
+                    >keyboard_double_arrow_right</span
+                  >
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div style="width: 100%; display: inline-block; text-align: right">
+            <button
+              type="button"
+              class="btn_sm navy"
+              onclick="location.href='/board/insBoard'"
+            >
+              글 작성
+            </button>
+          </div>
+        </div>
+        <!--//content_box-->
+      </div>
+      <!--//white_box-->
+    </div>
+    <!--//s_container-->
+  </body>
+  <script th:inline="javascript">
+    let page =  [[${pageResp.page}]];
+    }
+  </script>
+  <script src="/js/board/board.js"></script>
+</html>

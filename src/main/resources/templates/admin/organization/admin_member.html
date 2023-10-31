@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+  </script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_organization.html");
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu_admin").load("/inc/topmenu_admin.html");
+    });
+
+
+  </script>
+  <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+  />
+  <style>
+    .modify-chk {
+      appearance: auto;
+      width: 18px;
+      height: 18px;
+      accent-color: #0a1032;
+    }
+    /*관리자모드 조직관리>임직원관리 페이지만 적용하는 좌메뉴 css*/
+    .organization {
+      left:268px !important;
+      border-left: 1px solid #c1c8e4;
+      border-radius: 0 !important;
+    }
+  </style>
+
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu_admin"></div>
+  <div class="white_box">
+
+
+    <div class="leftmenu" id="leftmenu">
+      <ul>
+        <li>
+          <!--      <p class="depth1_active">-->
+          <p>
+            <a href="/admin/org/selDepart">부서 관리</a>
+          </p>
+        </li>
+        <li>
+          <p>
+            <a href="/admin/org/selMember">임직원 관리</a>
+          </p>
+        </li>
+      </ul>
+    </div>
+
+
+    <div class="organization">
+      <ul>
+        <li>
+          <p class="depth1 active" th:data-id="0" onclick="adminMemberAllList()">
+            <a href="" onclick="return false">DEPS</a>
+          </p>
+          <div th:each="depth1 : ${deptTreeRespList}" onclick="depth1Click(this)"  >
+            <ul>
+              <li>
+                <p class="depth2" th:onclick="'adminFirstList('+${depth1.getDepartmentNo()} +')'" >
+                  <a href="" onclick="return false" th:text="${depth1.getDepartmentName()}"><span class="material-symbols-outlined">expand_less</span></a>
+                </p>
+                <ul class="depth3" th:each="depth2 : ${depth1.children}" style="display:none; cursor: pointer">
+                  <li  class="" th:if="${!depth2.isDepartmentFlag()}">
+                    <a  th:onclick="'memberList(' + ${depth2.departmentNo} + ' )'"  th:text="${depth2.departmentName}" ></a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </li>
+        
+      </ul>
+    </div>
+
+    <!--//leftmenu-->
+
+    <div class="content_box_admin">
+      <p class="con_tit">임직원관리</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        조직관리
+        <span class="material-symbols-outlined"> navigate_next </span>
+        임직원관리
+      </div>
+      <div class="table_top">
+
+        <div class="tb_right">
+
+        </div>
+      </div>
+      <!--//table_top-->
+
+      <table id="adminTable" class="tb_st1" summary="">
+        <caption></caption>
+        <colgroup>
+          <col width="15%" />
+          <col width="15%" />
+          <col width="15%" />
+          <col width="15%" />
+          <col width="20%" />
+          <col width="20%" />
+        </colgroup>
+        <thead>
+        <tr>
+          <th>이름</th>
+          <th>부서</th>
+          <th>직책</th>
+          <!--          <th>수정자</th>-->
+          <th>수정일</th>
+          <th>활성유무</th>
+          <th>수정</th>
+        </tr>
+        </thead>
+        <tbody id="adminMember-tbody">
+        <tr th:each="allDepartmentList, iterStat  : ${departRespList}">
+          <td th:text="${allDepartmentList.memberNameKr}"></td>
+          <td th:text="${allDepartmentList.departmentName}"></td>
+          <td th:text="${allDepartmentList.staffName}">4444</td>
+          <!--          <td th:text="${allDepartmentList.updateName}"></td>-->
+          <td th:text="${allDepartmentList.updateDate}">5555</td>
+          <td th:text="${allDepartmentList.memberFlag}" >6666</td>
+          <td> <button class="btn_md" type="button" th:onclick="'modal_onoff(1, 1); adminMemberModifyForm(\'' + ${allDepartmentList.memberNo} + '\')'">수정</button>
+            <!-- 아래에 departmentDepth 값을 받지만 화면에 출력되지 않도록 추가 -->
+            <input id="adminStaffName" name="adminStaffName" type="hidden" th:value="${allDepartmentList.staffName}" />
+            <input id="adminEnable" name="adminEnable" type="hidden" th:value="${allDepartmentList.memberEnableDate}" />
+            <!--          <input id="createMemberName" name="createMemberName" type="hidden" th:value="${createName}" />-->
+          </td>
+        </tr>
+        </tbody>
+
+      </table>
+
+    </div>
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+
+
+<!--부서 정보 가져오기 폼-->
+
+
+
+<!-- 임직원  수정 모달 Modal -->
+
+<div id="modal_1" class="de-modal">
+  <div class="modal-content modal_w1090">
+          <span class="close" onclick="modal_onoff(1, 2)">
+            <span class="material-symbols-outlined"> close </span>
+          </span>
+    <p class="modal-title">회원 정보 수정</p>
+    <form id="adminMemberForm" action="/admin/org/udtMember" method="post" enctype="multipart/form-data">
+      <div class="member_join">
+
+        <div class="user_info">
+          <ul>
+
+            <li>
+              <label for="admin_modify_memberNameKr">한글이름</label>
+              <input type="text" name="admin_modify_memberNameKr" id="admin_modify_memberNameKr" placeholder="" readonly />
+            </li>
+
+
+            <!--부서-->
+            <li id="adminDepartmentParent-id">
+              <label for="adminDepartmentSelect">부서</label>
+              <div
+                      class="select_mate"
+                      data-mate-select="active"
+                      style="width: 294px"
+              >
+                <select name="adminDepartmentSelect" onchange="" onclick="return false;" id="adminDepartmentSelect">
+                  <option th:each="adminMember : ${adminMemberList}" th:value="${adminMember.departmentNo}" th:text="${adminMember.departmentName}">부서</option>
+                </select>
+                <p
+                        class="selecionado_opcion"
+                        onclick="open_select(this)"
+                ></p>
+                <span onclick="open_select(this)" class="icon_select_mate">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                <div class="cont_list_select_mate">
+                  <ul class="cont_select_int"></ul>
+                </div>
+              </div>
+            </li>
+
+
+
+            <li>
+              <label for="adminStaff">직책</label>
+              <div
+                      class="select_mate"
+                      data-mate-select="active"
+                      style="width: 294px"
+              >
+                <select name="adminStaff" onchange="" onclick="return false;" id="adminStaff">
+                  <option th:each="adminStaffList : ${adminStaffList}" th:value="${adminStaffList.staffNo}" th:text="${adminStaffList.staffName}">직책</option>
+                </select>
+                <p
+                        class="selecionado_opcion"
+                        onclick="open_select(this)"
+                ></p>
+                <span onclick="open_select(this)" class="icon_select_mate">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                <div class="cont_list_select_mate">
+                  <ul class="cont_select_int"></ul>
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <label for="admin_enable_date">입사일</label>
+              <input type="date" name="admin_enable_date" id="admin_enable_date"   readonly/>
+            </li>
+
+
+            <li>
+              <label for="admin_modify_leaveDate">퇴사일</label>
+              <input type="date" name="admin_modify_leaveDate" id="admin_modify_leaveDate" />
+            </li>
+
+
+
+          </ul>
+          <div class="btn_al_r">
+            <button type="button" class="btn_cancel" onclick="modal_onoff(1, 2)">취소</button>
+            <button type="button" class="btn_join" id="admin_member_modify"  onclick="adminMemberModify()">수정</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- //Modal -->
+
+<script type="text/javascript">
+
+</script>
+</body>
+
+</script>
+<script th:inline="javascript">
+  let adminUrlList = [[${adminUrlList}]];
+</script>
+
+<script src="/js/organization/adminOrg.js"></script>
+
+
+
+
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="thhp://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/index_layout}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div layout:fragment="content">
+    <link href="/css/main.css" rel="stylesheet" />
+    <script type="text/javascript" th:inline="javascript">
+        let standardOpenTime = [[${standardTime.openTime}]]; //출근 기준 시간
+        let standardCloseTime = [[${standardTime.closeTime}]]; //퇴근 기준 시간
+    </script>
+<div class="m_container">
+    <div class="m_leftbox">
+        <div class="m_topmenu">
+            <div th:replace="fragments/topmenu :: topmenu"></div>
+            <div class="dashboard_info">
+                <div class="db_info_box">
+                    <div class="db_commute">
+                        <div class="commute_txt">
+                            <span th:if="${myRollbook.status eq '근무중'}">근무중</span>
+                            <span th:if="${myRollbook.status eq '미출근'}" style="background: #f64130">미출근</span>
+                            <span th:if="${myRollbook.status eq '퇴근'}" style="background: #52bb00">퇴근</span>
+                            <span>나의 출퇴근</span>
+                        </div>
+                        <div class="commute_box">
+                            <div class="commute_time">
+                                <p>출근시간</p>
+                                <p th:text="${myRollbook.openTime}">08:45</p>
+                            </div>
+                            <div class="commute_time">
+                                <p>퇴근시간</p>
+                                <p th:text="${myRollbook.closeTime}">18:05</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="db_annual">
+                        <div class="annual_txt">
+                            <span th:text="'총 ' + ${myAnnual.totalAnnual} +'일'">총 15일</span> <span>나의 연차</span>
+                        </div>
+                        <div class="annual_box">
+                            <div class="annual_time">
+                                <p>사용일</p>
+                                <p><span th:text="${myAnnual.usedAnnual}"
+                                         style="font-size: 32px">05</span> <span>일</span></p>
+                            </div>
+                            <div class="annual_time">
+                                <p>잔여일</p>
+                                <p><span th:text="${myAnnual.remainedAnnual}"
+                                         style="font-size: 32px">10</span> <span>일</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="db_time" id="db_time">
+                    <p>현재시간</p>
+                    <p th:text="${#calendars.format(#calendars.createNow(), 'HH:mm:ss')}">--:--:--</p>
+                    <p th:text="${#calendars.format(#calendars.createNow(), 'yyyy년 MM월 dd일')}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="m_count">
+            <ul>
+                <li>
+                    <a th:href="@{/aprv/selDocAprv/progress}">
+                        <p>
+                            <span><img src="/img/FiPenTool.png" alt="아이콘" /></span>
+                            결재진행
+                        </p>
+                        <p th:text="${approval.aprvProgress + '건'}">1건</p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/aprv/selDocAprv/pending}">
+                        <p>
+                            <span><img src="/img/FiClock.png" alt="아이콘" /></span>
+                            결재대기
+                        </p>
+                        <p th:text="${approval.aprvPending + '건'}">1건</p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/aprv/selDocAprv/completed}">
+                        <p>
+                            <span><img src="/img/FiCheckCircle.png" alt="아이콘" /> </span>
+                            결재완료
+                        </p>
+                        <p th:text="${approval.aprvCompleted + '건'}">1건</p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/aprv/selDocAprv/cancel}">
+                        <p>
+                            <span><img src="/img/RiFileForbidLine.png" alt="아이콘"/></span>
+                            결재반려
+                        </p>
+                        <p th:text="${approval.aprvRejected + '건'}">1건</p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/aprv/selDocAprv/ref}">
+                        <p>
+                            <span><img src="/img/FiBookOpen.png" alt="아이콘" /> </span>
+                            참조문서
+                        </p>
+                        <p th:text="${approval.aprvReference + '건'}">1건</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="m_boardbox">
+            <div class="m_board">
+                <div class="board_top">
+                    <span class="board_tit">공지사항</span>
+                    <button type="button" onclick="location.href='/board/selNoticeBoard'">더보기</button>
+                </div>
+                <ul>
+                    <li th:if="${noticeList.isEmpty()}">공지사항이 없습니다.</li>
+                    <li th:each="notice : ${noticeList}">
+                        <p>
+                            <span th:if="${notice.noticeFlag}" class="notice">공지</span>
+                            <a th:text="${notice.title}" th:href="@{'/board/selNoticeBoardDetail/' + ${notice.boardNo}}">뎁스 규정집(2022년 10월) 안내</a>
+                        </p>
+                        <p>
+                            <span th:text="${notice.createDate}">2022.05.05</span><span th:text="${notice.createTime}"></span><span th:text="${notice.member}">설경수</span>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <div class="m_board">
+                <div class="board_top">
+                    <span class="board_tit">신규게시글</span>
+                    <button type="button" onclick="location.href='/board/selBoard'">더보기</button>
+                </div>
+                <ul>
+                    <li th:if="${boardList.isEmpty()}">신규게시글이 없습니다.</li>
+                    <li th:each="board : ${boardList}">
+                        <p>
+                            <a th:text="${board.title}" th:href="@{'/board/selBoardDetail/' + ${board.boardNo}}">뎁스 규정집(2022년 10월) 안내</a>
+                        </p>
+                        <p>
+                            <span th:text="${board.createDate}">2022.05.05</span><span th:text="${board.createTime}"></span><span th:text="${board.member}">설경수</span>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--//m_leftbox-->
+    <div class="m_rightbox">
+        <div class="m_profile">
+            <div class="profile_photo">
+                <img th:src="|${memberInfo.imgNo == null ? '' : '/files/images/' + memberInfo.imgNo}|"/>
+            </div>
+            <div class="profile_info">
+                <p th:text="${memberInfo.memberName}"></p>
+                <p><span>소속</span> <span>|</span> <span th:text="${memberInfo.departmentName}">개발본부_디자인팀</span></p>
+                <p><span>직책</span> <span>|</span> <span th:text="${memberInfo.staffName}">개발본부_디자인팀</span></p>
+            </div>
+        </div>
+        <div class="m_btnbox" th:unless="${#strings.equals(myRollbook.status, '근무중')}">
+            <!--버튼에 class:gray_type 추가시 버튼 비활성화-->
+            <button type="button" class="btn_in" onclick="isOpenTime()">출근</button>
+            <button type="button" class="btn_out gray_type" disabled>퇴근</button>
+        </div>
+        <div class="m_btnbox" th:if="${#strings.equals(myRollbook.status, '근무중')}">
+            <!--버튼에 class:gray_type 추가시 버튼 비활성화-->
+            <button type="button" class="btn_in gray_type" disabled>출근</button>
+            <button type="button" class="btn_out" onclick="isCloseTime()">퇴근</button>
+        </div>
+        <div class="m_calendar">
+            <div class="calendar_top">
+                <span class="year_month" id="year_month">June 2023</span>
+                <div class="calendar_btn">
+                    <button type="button">
+                        <span class="material-symbols-outlined" onclick="preCaleandar()"> chevron_left </span>
+                    </button>
+                    <button type="button">
+                        <span class="material-symbols-outlined" onclick="nextCaleandar()"> chevron_right </span>
+                    </button>
+                </div>
+            </div>
+            <table class="calendar">
+                <colgroup>
+                    <col width="15%" />
+                    <col width="14%" />
+                    <col width="14%" />
+                    <col width="14%" />
+                    <col width="14%" />
+                    <col width="14%" />
+                    <col width="15%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Su</th>
+                    <th>Mo</th>
+                    <th>Tu</th>
+                    <th>We</th>
+                    <th>Th</th>
+                    <th>Fr</th>
+                    <th>Sa</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td class="today">7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>12</td>
+                    <td>13</td>
+                    <td>14</td>
+                    <td>15</td>
+                    <td>16</td>
+                    <td>17</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>19</td>
+                    <td>20</td>
+                    <td>21</td>
+                    <td>22</td>
+                    <td>23</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>25</td>
+                    <td>26</td>
+                    <td>27</td>
+                    <td>28</td>
+                    <td>29</td>
+                    <td>30</td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="m_progressbar">
+            <!-- 프로젝트 박스 시작 -->
+            <div class="progressbar_box" th:each="project, index : ${projectList}">
+                <span class="icon_box">
+<!--                    <img src="/img/AiOutlineAudit.png" alt="아이콘"/>-->
+                    <img th:if="${index.index % 3 == 0}" src="/img/AiOutlineAudit.png" alt="아이콘"/>
+                    <img th:if="${index.index % 3 == 1}" src="/img/FaRegFolder.png" alt="아이콘"/>
+                    <img th:if="${index.index % 3 == 2}" src="/img/BiCodeBlock.png" alt="아이콘"/>
+                </span>
+                <div class="progressbar_info">
+                    <p>
+                <span class="info_tit" th:text="${project.projectName}">프로젝트명</span
+                ><span class="info_date" th:text="'D-' + ${project.projectDeadline < 10 ? '0' + project.projectDeadline : project.projectDeadline}">D-05</span>
+                    </p>
+                    <!--progressbar:아래 % 수정시 변경-->
+                    <div class="progressbar"><span th:style="'width: ' + ${project.projectProgress} + '%'" th:text="${project.projectProgress + '%'}">80%</span></div>
+                    <button type="button" class="btn_more" title="자세히보기"
+                            th:onclick="'window.location.href=\'/project/selProjectMainDetail/' + ${project.projectNo} +'\''">
+                        <img src="/img/AiOutlineMore.png" alt="자세히보기" />
+                    </button>
+                </div>
+            </div>
+            <!-- 프로젝트 박스 끝 -->
+        </div>
+    </div>
+    <!--//m_rightbox-->
+</div>
+<!--//m_container-->
+
+<!-- 모달 영역 시작 -->
+<div id="myModal" class="modal">
+    <!-- Modal_1 -->
+    <div id="modal_1" class="de-modal">
+        <div class="modal-content modal_w500">
+              <span class="close" onclick="modal_onoff(1, 2)">
+                <span class="material-symbols-outlined"> close </span>
+              </span>
+            <p class="modal-title" id="modal-title">사유</p>
+            <br />
+
+            <textarea
+                    class="textarea"
+                    id="rollbook_reason"
+                    placeholder="사유를 입력하세요."
+                    style="width: 96%; height: 100px; margin-left: 10px; resize: none;"
+            ></textarea>
+            <input type="hidden" id="rollbook_time"/>
+            <input type="hidden" id="rollbook_state"/>
+            <button type="button" class="btn_md navy" id="rollbook_apply" onclick="submitRollbookBtn()" style="margin-left: 84%; margin-top: 10px;">등록</button>
+            <br />
+            <br />
+        </div>
+    </div>
+    <!-- //Modal_1 -->
+</div>
+<!-- 모달 영역 종료 -->
+
+<!-- 스크립트 추가 영역 -->
+<script src="/js/index/currentTime.js"></script>
+<script src="/js/index/projectListHandler.js"></script>
+
+<script>
+    window.onload = function () {
+        if (typeof window.history.pushState === 'function') {
+            window.history.pushState({}, "Hide", location.pathname);
+            window.onpopstate = function () {
+                window.history.pushState({}, "Hide", location.pathname);
+            };
+        }
+    };
+</script>
+
+<!-- 스크립트 추가 영역 끝 -->
+</div>
+</html>

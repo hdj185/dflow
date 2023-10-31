@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    let codeList = [[${codeList}]];
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_rollbook.html");
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu_admin").load("/inc/topmenu_admin.html");
+    });
+  </script>
+  <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+  />
+  <style>
+    .modify-chk {
+      appearance: auto;
+      width: 18px;
+      height: 18px;
+      accent-color: #0a1032;
+    }
+
+    .edit_modal_tbl, .edit_modal_ul {
+      margin: auto;
+    }
+
+    .edit_modal_tbl td, .edit_modal_ul li {
+      padding: 0.5em 0;
+    }
+
+    .edit_modal_tbl label, .edit_modal_ul label {
+      width: 100px;
+      padding-right: 30px;
+      box-sizing: border-box;
+      float: left;
+      color: #0a1032;
+      text-align: right;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .edit_modal_tbl textarea {
+      resize: none;
+    }
+  </style>
+
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu_admin"></div>
+  <div class="white_box">
+    <div id="leftmenu"></div>
+    <!--//leftmenu-->
+    <div class="content_box">
+      <p class="con_tit">근태관리</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        근태관리
+        <span class="material-symbols-outlined"> navigate_next </span>
+        근태관리
+      </div>
+
+      <!--      날짜로 검색-->
+      <form id="rollForm" method="get" th:action="@{/admin/rollbook/selRollbook}">
+        <div class="table_top">
+          <div style="margin-top: 0px; float: left;">
+            <button type="button" class="btn_md navy" id="editRollbookBtn">
+              <span class="material-symbols-outlined">edit</span> 근태 수정
+            </button>
+
+            <button type="button" class="btn_md navy hv_red"   onclick="adminDeleteRollbook()">
+              삭제
+            </button>
+
+            <button type="button" class="btn_md gray logout" onclick="modal_onoff(7, 1)">
+              <span class="material-symbols-outlined">manage_history</span>
+              근태 기준 수정
+            </button>
+          </div>
+          <div class="tb_right">
+            <label for="date_choice1"></label>
+            <input
+                    type="month" id="date_choice1" class="date_choice"
+                    th:value="${searchList.rollbookDate}" name="rollbookDate"
+            />
+            <button type="submit" title="검색" class="btn_md navy">검색</button>
+          </div>
+        </div>
+        <!--//table_top-->
+      </form>
+
+      <table class="tb_st1" summary="">
+        <caption></caption>
+        <colgroup>
+          <col width="5%" />
+          <col width="10%" />
+          <col width="15%" />
+          <col width="10%" />
+          <col width="10%" />
+          <col width="10%" />
+          <col width="10%" />
+          <col width="10%" />
+          <col width="*" />
+        </colgroup>
+        <thead>
+        <tr>
+          <th>선택</th>
+          <th>정정</th>
+          <th>날짜</th>
+          <th>직원 ID</th>
+          <th>근무상태</th>
+          <th>이름</th>
+          <th>출근</th>
+          <th>퇴근</th>
+          <th>비고</th>
+        </tr>
+        </thead>
+
+        <tbody id="adminDocumentRollbookCard">
+        <tr th:each="correct : ${correctList}">
+          <td>
+            <!-- 체크박스가 안 나오던 것을 appearance: auto로 바꾸니 됐음 -->
+            <input type="checkbox" class="modify-chk" name="rollbookNoCheck" th:value="${correct.rollbookNo}">
+          </td>
+          <td>정정요청</td>
+          <td th:text="${correct.rollbookDate}">2023-07-27 (목)</td>
+          <td th:text="${correct.memberId}"></td>
+          <td th:text="${correct.rollbookStatus}">출근</td>
+          <td th:text="${correct.memberNameKr}"></td>
+          <td th:text="${correct.rollbookOpenTime}">08:59</td>
+          <td th:text="${correct.rollbookCloseTime}"></td>
+          <td th:text="${correct.rollbookContent}">정상 출근</td>
+
+        </tr>
+        <tr th:each="rollbook : ${rollbookList}">
+          <td>
+            <!-- 체크박스가 안 나오던 것을 appearance: auto로 바꾸니 됐음 -->
+            <input type="checkbox" class="modify-chk" th:value="${rollbook.rollbookNo}">
+
+          </td>
+          <td></td>
+          <td th:text="${rollbook.rollbookDate}">2023-07-27 (목)</td>
+          <td th:text="${rollbook.memberId}"></td>
+          <td th:text="${rollbook.rollbookStatus}">출근</td>
+          <td th:text="${rollbook.memberNameKr}"></td>
+          <td th:text="${rollbook.rollbookOpenTime}">08:59</td>
+          <td th:text="${rollbook.rollbookCloseTime}"></td>
+          <td th:text="${rollbook.rollbookContent}">정상 출근</td>
+
+
+        </tr>
+        <tr th:if="${noRollbook}">
+          <td colspan="6">기록이 없습니다.</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <!--      관리자 롤복 페이징 -->
+      <div class="pagination" id="pagination">
+        <ul>
+          <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+            <a class="start_page"
+               th:href="@{/admin/rollbook/selRollbook(page=${pageInfo.startPage}, rollbookDate=${searchList.rollbookDate}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="처음페이지">
+              <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+            </a>
+          </li>
+          <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+            <a class="pre_page"
+               th:href="@{/admin/rollbook/selRollbook(page=${pageInfo.nowPage - 1}, rollbookDate=${searchList.rollbookDate}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="이전페이지">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </a>
+          </li>
+          <li th:if="${pageInfo.lastPage > 0}" th:each="page : ${#numbers.sequence(pageInfo.firstPage, pageInfo.lastPage)}">
+            <a th:classappend="${page == pageInfo.nowPage} ? 'present'"
+               th:href="@{/admin/rollbook/selRollbook(page=${page}, rollbookDate=${searchList.rollbookDate}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" th:text="${page}">3</a>
+          </li>
+          <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+            <a class="next_page"
+               th:href="@{/admin/rollbook/selRollbook(page=${pageInfo.nowPage + 1}, rollbookDate=${searchList.rollbookDate}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="다음페이지">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </a>
+          </li>
+          <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+            <a class="end_page"
+               th:href="@{/admin/rollbook/selRollbook(page=${pageInfo.endPage},  keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="끝페이지">
+              <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+
+    </div>
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+
+<div id="myModal" class="modal">
+  <!-- Modal_6 -->
+  <div id="modal_6" class="de-modal" style="display: none">
+    <div class="modal-content" style="width: 800px">
+    <span class="close" onclick="modal_onoff(6, 2)">
+      <span class="material-symbols-outlined">close</span>
+    </span>
+
+      <p class="modal-title">근태 수정</p>
+      <div class="modal-body">
+        <table class="edit_modal_tbl">
+
+          <tr>
+            <td><label for="open_time">출근 시간</label></td>
+            <td><input id="open_time" type="time" class="date_choice" style="width: 200px"></td>
+            <td><label for="open_state">상태</label></td>
+            <td>
+              <div class="select_mate" data-mate-select="active" style="width: 200px" >
+                <select id="open_state" name="" onchange="" onclick="return false;">
+                  <option th:each="code : ${codeList}" th:if="${#strings.startsWith(code.codeName, 'OPEN_')}"
+                          th:text="${code.codeAccount}"
+                          th:value="${code.codeAccount}"></option>
+                </select>
+                <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                <span onclick="open_select(this)" class="icon_select_mate">
+                  <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                </span>
+                <div class="cont_list_select_mate">
+                  <ul class="cont_select_int"></ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="close_time">퇴근 시간</label></td>
+            <td><input id="close_time" type="time" class="date_choice" style="width: 200px"></td>
+            <td><label for="close_state">상태</label></td>
+            <td>
+              <div class="select_mate" data-mate-select="active" style="width: 200px" >
+                <select id="close_state" name="" onchange="" onclick="return false;">
+                  <option th:each="code : ${codeList}" th:if="${#strings.startsWith(code.codeName, 'CLOSE_')}"
+                          th:text="${code.codeAccount}"
+                          th:value="${code.codeAccount}"></option>
+                </select>
+                <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                <span onclick="open_select(this)" class="icon_select_mate">
+                  <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                </span>
+                <div class="cont_list_select_mate">
+                  <ul class="cont_select_int"></ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><label for="rollbook_content">비고</label></td>
+            <td colspan="3"><textarea id="rollbook_content" class="textarea" style="width: 100%; height: 100px" ></textarea></td>
+          </tr>
+
+
+        </table>
+        <div class="btn_al_c">
+          <button type="button" class="btn_md navy" id="rollbookUpdate" name="rollbookUpdate" onclick="sumbitUpdateRollbook()">확인</button>
+          <button type="button" class="btn_md gray hv_red" onclick="modal_onoff(6, 2)">취소</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- //Modal_6 -->
+  <!-- Modal_7 -->
+  <div id="modal_7" class="de-modal" style="display: none">
+    <div class="modal-content modal_w500">
+    <span class="close" onclick="modal_onoff(7, 2)">
+      <span class="material-symbols-outlined">close</span>
+    </span>
+
+      <p class="modal-title">근태 기준 수정</p>
+      <div class="modal-body">
+        <ul class="modal-list">
+          <li>
+            <label>출근 기준</label>
+            <input id="setting_open_time" type="time" class="input_txt w80" th:value="${standardTime.openTime}">
+          </li>
+          <li>
+            <label>퇴근 기준</label>
+            <input id="setting_close_time" type="time" class="input_txt w80" th:value="${standardTime.closeTime}">
+          </li>
+        </ul>
+        <div class="btn_al_r">
+          <button type="button" class="btn_md navy" name="rollbookUpdate" onclick="clickRollbookSettingbtn()">수정</button>
+          <button type="button" class="btn_md gray hv_red" onclick="modal_onoff(7, 2)">취소</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- //Modal_7 -->
+
+</div>
+
+<script type="text/javascript">
+  // Event listener for 정정신청 button click
+  $("#editRollbookBtn").on("click", function() {
+    // Check if any checkboxes are selected
+    if ($(".modify-chk:checked").length === 1) {
+      let checkedValue = $(".modify-chk:checked").val();
+      setRollbookEditModal(checkedValue);
+      modal_onoff(6, 1);
+    } else if($(".modify-chk:checked").length > 1) {
+      modal_onoff(6, 2);
+      alert_pop(1, "하나만 선택해주세요.");
+    } else {
+      modal_onoff(6, 2);
+      alert_pop(1, "선택한 항목이 없습니다.");
+    }
+  });
+
+
+  // Event listener for modal confirm button
+  $("#modify_apply").on("click", function() {
+    // You can perform actions here to submit the selected values to the backend or any other processing
+    // For demonstration purposes, we'll just show an alert message
+    alert_pop2(1, "정정신청이 접수되었습니다.", function () {
+      modal_onoff(6, 2);
+      document.getElementById("modify_reason").value='';
+      $(":checkbox").prop("checked",false);
+    });
+  });
+
+</script>
+<script src="/js/admin_rollbook.js"></script>
+</body>
+</html>

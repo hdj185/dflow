@@ -1,0 +1,353 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="명령어">
+    <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+    <link rel="canonical" href="대표URL">
+    <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+    <meta name="description" content="페이지 설명">
+    <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+    <meta name="keywords" content="keyword1, keyword2">
+    <!-- 소셜 미디어 공유 -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="(주)뎁스">
+    <meta property="og:description" content="(주)뎁스">
+    <meta property="og:image" content="http://www.mysite.com/myimage.jpg">
+    <meta property="og:url" content="http://www.mysite.com">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>(주)뎁스</title>
+    <link href="/css/common.css" rel="stylesheet">
+    <link href="/css/documentRegister.css" rel="stylesheet">
+    <script src="/js/common.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        let username = [[${#authentication.principal.nickname}]];
+        let userRole = [[${#authentication.principal.authorities[0].authority}]];
+        let userNo = [[${#authentication.principal.memberNo}]]
+        let signNo = [[${memberInfo.signNo}]];
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#header").load("/inc/header.html", function() {
+                // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+                $("#header_user_name").text(username);
+            });
+            $("#topmenu").load("/inc/topmenu.html");
+            $("#leftmenu").load("/inc/leftmenu/leftmenu_approval.html");
+        });
+    </script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
+    <link href="/css/documentModal.css" rel="stylesheet">
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+    <div id="topmenu"></div>
+    <div class="white_box">
+        <div id="leftmenu"></div>
+
+        <!--//leftmenu-->
+        <div class="content_box" id="content_box">
+            <div>
+                <p class="con_tit" th:text="${searchList.getDocType()}">전체문서</p>
+                <div class="location_box" id="location_box">
+                    <span class="material-symbols-outlined"> home </span>
+                    <span class="material-symbols-outlined"> navigate_next </span>
+                    전자결재
+                    <span class="material-symbols-outlined"> navigate_next </span>
+                    결재함
+                    <span class="material-symbols-outlined"> navigate_next </span>
+                    <span class="location" th:text="${searchList.getDocType()}">전체문서</span>
+                </div>
+
+                <form id="docAprvForm" method="get" th:action="@{/aprv/selDocAprv/{docState}(docState=${docState})}">
+                    <div class="search_box" style="text-align: center; width: 100%">
+                        <div class="row" style="width: auto; float: right; margin: 5px 0px">
+                            <span class="sb_txt">검색기간</span>
+                            <div class="select_mate" data-mate-select="active" style="width: 145px" data-indx-select="0" data-selec-open="false">
+                                <select name="dateType" id="dateType" onchange="" onclick="return false;">
+                                    <option disabled th:selected="${searchList.dateType == null}"  value="">선택</option>
+                                    <option th:selected="${searchList.dateType == '결재일'}" value="결재일" >기안일 기준</option>
+                                    <option th:selected="${searchList.dateType == '기안일'}" value="기안일" >결재일 기준</option>
+                                </select>
+                                <p class="selecionado_opcion" onclick="open_select(this)" data-n-select="0"></p>
+                                <span onclick="open_select(this)" class="icon_select_mate" data-n-select="0">
+                                                <span class="material-symbols-outlined">
+                                                  keyboard_arrow_down
+                                                </span>
+                                              </span>
+                                <div class="cont_list_select_mate">
+                                    <ul class="cont_select_int">
+                                    </ul>
+                                </div>
+                            </div>
+                            <label for="startDate"></label>
+                            <input type="date" id="startDate" name="startDate" class="date_choice"
+                                   th:value="${searchList.getStartDate()}">
+                            <span class="sb_txt">~</span>
+                            <label for="endDate"></label>
+                            <input type="date" id="endDate" name="endDate" class="date_choice"
+                                   th:value="${searchList.getEndDate()}">
+                            <button class="month_choice" onclick="dateBtnHandler(3)" style="width:85px;" title="3개월"
+                                    type="button">
+                                3개월
+                            </button>
+                            <button class="month_choice" onclick="dateBtnHandler(6)" style="width:85px;" title="6개월"
+                                    type="button">
+                                6개월
+                            </button>
+                            <button class="month_choice" onclick="dateBtnHandler(12)"
+                                    style="width:85px; margin-right: 3px;" title="12개월"
+                                    type="button">
+                                12개월
+                            </button>
+                            <label for="search_txt"></label>
+                            <input
+                                    type="text"
+                                    id="search_txt"
+                                    class="search_txt"
+                                    name="keyword"
+                                    placeholder="(문서분류/기안자/진행상태 등) 검색"
+                                    style="width: 280px; margin-right: 3px;"
+                                    th:value="${searchList.keyword}"
+                            />
+                            <button type="submit" title="검색" class="btn_search">검색</button>
+                        </div>
+                    </div>
+                    <!--//search_box-->
+                    <div class="table_top">
+                        <div class="tb_left">총 <span th:text="${totalCount}">2525</span>건</div>
+                        <div class="tb_right">
+                            <div
+                                    class="select_mate"
+                                    data-mate-select="active"
+                                    style="width: 145px"
+                            >
+                                <select name="sortType" onchange="submitForm()" onclick="return false;">
+                                    <option th:selected="${sortType == 'desc'}" value="desc">최신순</option>
+                                    <option th:selected="${sortType == 'asc'}" value="asc">과거순</option>
+                                </select>
+                                <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                                <span class="icon_select_mate" onclick="open_select(this)">
+                  <span class="material-symbols-outlined">
+                    keyboard_arrow_down
+                  </span>
+                </span>
+
+                                <div class="cont_list_select_mate">
+                                    <ul class="cont_select_int"></ul>
+                                </div>
+                            </div>
+                            <div
+                                    class="select_mate"
+                                    data-mate-select="active"
+                                    style="width: 145px"
+                            >
+                                <select name="pageSize" onchange="submitForm()" onclick="return false;">
+                                    <option th:selected="${pageSize == 20}" value="20">20개</option>
+                                    <option th:selected="${pageSize == 50}" value="50">50개</option>
+                                </select>
+                                <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                                <span class="icon_select_mate" onclick="open_select(this)">
+                  <span class="material-symbols-outlined">
+                    keyboard_arrow_down
+                  </span>
+                </span>
+                                <div class="cont_list_select_mate">
+                                    <ul class="cont_select_int"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--//table_top-->
+                </form>
+
+                <table class="tb_st1" summary="">
+                    <caption></caption>
+                    <colgroup>
+                        <col width="5%">
+                        <col width="10%">
+                        <col width="*">
+                        <col width="7%">
+                        <col width="7%">
+                        <col width="7%">
+                        <col width="10%">
+                        <col width="15%">
+                        <col width="15%">
+                        <col width="10%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>문서분류</th>
+                        <th>문서번호</th>
+                        <th>승인요청</th>
+                        <th>부서명</th>
+                        <th>기안자</th>
+                        <th>직급</th>
+                        <th>기안일</th>
+                        <th>결재일</th>
+                        <th>진행상태</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="documentAprvCard">
+                    <tr th:each="allList : ${docAprvPageList}"
+                        th:onclick="'docAprvDetail(' + ${allList.docNo} + ')'">
+
+                        <td th:text="${allList.docNo}"></td>
+                        <td th:text="${allList.docFormNo}">연차신청서</td>
+
+                        <td th:text="${allList.docTTL}"></td>
+                        <td class="al_left">
+                            <!-- 기안자가 본인이 아닐 때 '승인요청' 표시 -->
+                            <span class="re_approval" th:if="${!#strings.equals(allList.memberId, memberId) && !#strings.equals(searchList.docType,'참조문서')}">승인요청</span>
+                        </td>
+
+                        <td th:text="${allList.departmentName}">디자인팀</td>
+                        <td th:text="${allList.memberNameKr}"></td>
+                        <td th:text="${allList.staffName}">사원</td>
+                        <td th:text="${allList.createDate}">2023.05.09 <span class="pd_l10">11:42</span></td>
+                        <td th:text="${allList.updateDate}">2023.05.09 <span class="pd_l10">11:42</span></td>
+                        <td>
+                            <span class="project-state" th:text="${allList.docState}"></span>
+                            <!-- 기안자가 본인이 아닐 때 '대기' 상태와 알림 아이콘 표시 -->
+                            <span class="fc_orange" th:if="${!#strings.equals(allList.memberId, memberId) && #strings.equals(allList.docState, '대기')}">
+
+        <span class="material-symbols-outlined">notification_important</span>
+                 </span>
+                        </td>
+                    </tr>
+                    <tr th:if="${totalCount == 0}">
+                        <td colspan="10" style="text-align: center;">해당 문서가 비어있습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination" id="pagination">
+                    <ul>
+                        <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+                            <a class="start_page"
+                               th:href="@{/aprv/selDocAprv/{docState}(docState=${docState}, page=${pageInfo.startPage}, startDate=${searchList.startDate}, endDate=${searchList.endDate}, dateType=${searchList.dateType},  keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="처음페이지">
+                                <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                            </a>
+                        </li>
+                        <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+                            <a class="pre_page"
+                               th:href="@{/aprv/selDocAprv/{docState}(docState=${docState}, page=${pageInfo.nowPage - 1}, startDate=${searchList.startDate}, endDate=${searchList.endDate}, dateType=${searchList.dateType}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="이전페이지">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </a>
+                        </li>
+                        <li th:if="${pageInfo.lastPage > 0}" th:each="page : ${#numbers.sequence(pageInfo.firstPage, pageInfo.lastPage)}">
+                            <a th:classappend="${page == pageInfo.nowPage} ? 'present'"
+                               th:href="@{/aprv/selDocAprv/{docState}(docState=${docState}, page=${page}, startDate=${searchList.startDate}, endDate=${searchList.endDate}, dateType=${searchList.dateType}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" th:text="${page}">3</a>
+                        </li>
+                        <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+                            <a class="next_page"
+                               th:href="@{/aprv/selDocAprv/{docState}(docState=${docState}, page=${pageInfo.nowPage + 1}, startDate=${searchList.startDate}, endDate=${searchList.endDate}, dateType=${searchList.dateType}, keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="다음페이지">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </a>
+                        </li>
+                        <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+                            <a class="end_page"
+                               th:href="@{/aprv/selDocAprv/{docState}(docState=${docState}, page=${pageInfo.endPage}, startDate=${searchList.startDate}, endDate=${searchList.endDate}, dateType=${searchList.dateType},  keyword=${searchList.keyword}, sortType=${sortType}, pageSize=${pageSize})}" title="끝페이지">
+                                <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--//content_box-->
+    </div>
+    <!--//white_box-->
+</div>
+<!--//s_container-->
+
+<!-- Modal -->
+<div id="modal_6" class="de-modal">
+    <div class="modal-content" style="width: 1400px; overflow-y: auto;">
+          <span class="close" onclick="modal_onoff(6,2)">
+            <span class="material-symbols-outlined"> close </span>
+          </span>
+        <p class="modal-title">결재문서</p>
+        <div class="print-modal-body">
+            <div class="print_btn" style="float: right">
+                <button type="button" id="withdrawal-btn" class="btn_md navy hv_red" style="display: none; margin-right: 5px;" onclick="clickWithdrawalBtn()">회수</button>
+                <button type="button" id="doc-modify-btn" class="btn_md navy hv_red" style="display: none; margin-right: 5px;" onclick="modifyBtn()">수정</button>
+                <button type="button" id="doc-delete-btn" class="btn_md navy hv_red" style="display: none; margin-right: 5px;" onclick="deleteBtn()">삭제</button>
+                <button type="button" class="btn_md_img navy print" onclick="pagePrint()">
+                    인쇄하기
+                </button>
+            </div>
+            <div class="doc_box">
+                <div id="docContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- //Modal -->
+
+<div id="myModal" class="modal">
+    <!-- Modal_7 -->
+    <div id="modal_7" class="de-modal">
+        <div class="modal-content modal_w500">
+              <span class="close" onclick="modal_onoff(7, 2)">
+                <span class="material-symbols-outlined"> close </span>
+              </span>
+            <p class="modal-title">결재 의견</p>
+            <br />
+            <textarea
+                    class="textarea"
+                    id="aprv_opinion"
+                    placeholder="의견을 입력하세요."
+                    style="width: 96%; height: 100px; margin-left: 10px; resize: none;"
+            ></textarea>
+            <div class="btn_al_r" style="padding-right: 10px">
+                <button type="button" class="btn_md navy hv_red" style="background-color: #c50000;" onclick="approveBtn('반려')">반려</button>
+                <button type="button" class="btn_md navy" onclick="approveBtn('승인')">승인</button>
+            </div>
+            <br />
+            <br />
+        </div>
+    </div>
+    <!-- //Modal_7 -->
+</div>
+
+
+
+
+<script th:inline="javascript">
+
+    function getMatchingClass(projectState, codes) {
+        for (let i = 0; i < codes.length; i++) {
+            if (projectState === codes[i].codeAccount) {  // 여기서
+                return codes[i].codeValue;
+            }
+        }
+        return "";
+    }
+
+
+    let projectStates = document.getElementsByClassName("project-state");
+    let selCodeList = [[${selCodeList}]];
+
+
+    for (let i = 0; i < projectStates.length; i++) {
+        let projectState = projectStates[i].textContent;
+        let matchingClass = getMatchingClass(projectState, selCodeList);
+
+        if (matchingClass !== "") {
+            projectStates[i].classList.add(matchingClass);
+        }
+    }
+
+
+</script>
+
+<script src="/js/approval/docAprvMain.js"></script>
+</body>
+</html>

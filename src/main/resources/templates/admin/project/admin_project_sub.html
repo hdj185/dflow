@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_project.html");
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu_admin").load("/inc/topmenu_admin.html");
+    });
+  </script>
+  <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+  />
+</head>
+<style>
+  .asterisk {
+    color: #f64130;
+  }
+</style>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu_admin"></div>
+  <div class="white_box">
+    <div id="leftmenu"></div>
+    <!--//leftmenu-->
+    <div class="content_box">
+      <p class="con_tit">프로젝트 등록</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        프로젝트 관리
+        <span class="material-symbols-outlined"> navigate_next </span>
+        프로젝트 관리
+      </div>
+      <div class="board_write">
+        <table class="tb_st2" summary="">
+          <caption></caption>
+          <colgroup>
+            <col width="15%" />
+            <col width="*%" />
+          </colgroup>
+          <tbody>
+          <tr>
+            <th>프로젝트 명<span class="asterisk"> *</span><span class="asterisk"> *</span></th>
+            <td><input type="text" id="projectName" placeholder="" class="input_txt" /></td>
+          </tr>
+          <tr>
+            <th>프로젝트 설명<span class="asterisk"> *</span></th>
+            <td><textarea id="projectDescription" placeholder="내용 입력" style="height: 100px"></textarea></td>
+          </tr>
+          <tr>
+            <th>프로젝트 구분<span class="asterisk"> *</span></th>
+            <td>
+              <div class="select_mate" data-mate-select="active" style="width: 321.33px" data-indx-select="0" data-selec-open="false">
+                <select id="projectType" onchange="" onclick="return false;">
+                  <option value="" selected>선택</option>
+                  <option th:each="code : ${typeCodes}" th:value="${code.codeAccount}"
+                          th:text="${code.codeAccount}"></option>
+                </select>
+                <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                <span onclick="open_select(this)" class="icon_select_mate">
+                                  <span class="material-symbols-outlined">
+                                    keyboard_arrow_down
+                                  </span>
+                                </span>
+                <div class="cont_list_select_mate">
+                  <ul class="cont_select_int"></ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>시작일<span class="asterisk"> *</span></th>
+            <td><input type="date" id="projectStartDate" style="width: 300px" class="date_choice" /></td>
+          </tr>
+          <tr>
+            <th>종료일<span class="asterisk"> *</span></th>
+            <td><input type="date" id="projectEndDate" style="width: 300px" class="date_choice" /></td>
+          </tr>
+          <tr>
+            <th>프로젝트 상태<span class="asterisk"> *</span></th>
+            <td>
+              <div class="select_mate" data-mate-select="active" style="width: 321.33px" data-indx-select="0" data-selec-open="false">
+                <select id="projectState" onchange="" onclick="return false;">
+                  <option value="" selected>선택</option>
+                  <option th:each="state : ${stateCodes}" th:value="${state.codeAccount}"
+                          th:text="${state.codeAccount}">진행중</option>
+                </select>
+                <p class="selecionado_opcion" onclick="open_select(this)"></p>
+                <span onclick="open_select(this)" class="icon_select_mate">
+                                  <span class="material-symbols-outlined">
+                                    keyboard_arrow_down
+                                  </span>
+                                </span>
+                <div class="cont_list_select_mate">
+                  <ul class="cont_select_int"></ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>진행률<span class="asterisk"> *</span></th>
+            <td>
+              <div class="percentage-input">
+                <input type="number" id="projectProgress" class="input_txt"
+                       min="0" max="100" onchange="progressListener()"
+                       style="width: 321.33px"/>
+                <span class="percentage-symbol">%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>투입공수<span class="asterisk"> *</span></th>
+            <td><input type="number" id="projectManhour" style="width: 321.33px" placeholder="" class="input_txt" /></td>
+          </tr>
+          <tr>
+            <th>투입인력<span class="asterisk"> *</span></th>
+            <td><input type="number" id="projectResources" style="width: 321.33px" placeholder="" class="input_txt" /></td>
+          </tr>
+          </tbody>
+        </table>
+        <table class="tb_st2" summary="">
+          <caption></caption>
+          <colgroup>
+            <col width="15%" />
+            <col width="*" />
+          </colgroup>
+          <tbody>
+          <tr>
+            <th>프로젝트 개요<span class="asterisk"> *</span></th>
+            <td><textarea id="projectOverview" placeholder="내용 입력" style="height: 100px"></textarea></td>
+          </tr>
+          <tr>
+            <th>프로젝트 목적<span class="asterisk"> *</span></th>
+            <td><textarea id="projectObjective" placeholder="내용 입력" style="height: 100px"></textarea></td>
+          </tr>
+          <tr>
+            <th>주요기능<span class="asterisk"> *</span></th>
+            <td><textarea id="projectFeatures" placeholder="내용 입력" style="height: 100px"></textarea></td>
+          </tr>
+          <tr>
+            <th>비고</th>
+            <td><input type="text" id="projectRemarks" placeholder="" class="input_txt" /></td>
+          </tr>
+          </tbody>
+        </table>
+        <p class="btn_al_r">
+          <button type="button" class="btn_sm navy"
+                  onclick="clickRegProjectBtn(3)">등록</button>
+        </p>
+      </div>
+    </div>
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+<script src="/js/project/createProject.js"></script>
+</body>
+</html>

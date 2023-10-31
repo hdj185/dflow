@@ -1,0 +1,34 @@
+<div class="leftmenu" id="leftmenu">
+  <ul>
+    <li>
+      <!--      <p class="depth1_active">-->
+      <p>
+        <a href="/admin/system/selAuthorization">접근권한 관리</a>
+      </p>
+    </li>
+    <li>
+      <p>
+        <a href="/admin/system/selLog">로그 관리</a>
+      </p>
+    </li>
+  </ul>
+</div>
+
+<script>
+  // 현재 페이지의 URI 경로
+  const currentPath = window.location.pathname;
+  // 선택된 button 인덱스
+  let buttonIndex;
+
+  // 접근권한 관리
+  if (currentPath.startsWith('/admin/system/selAuthorization')) {
+    buttonIndex = 1;
+    // 로그 관리
+  } else if (currentPath.startsWith('/admin/system/selLog')) {
+    buttonIndex = 2;
+  }
+
+  //ul 요소 선택
+  const p = document.querySelector('div#leftmenu ul li:nth-child(' + buttonIndex + ') p');
+  p.classList.add('depth1_active');
+</script>

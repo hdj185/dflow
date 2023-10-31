@@ -1,0 +1,27 @@
+<!--폴더 추가 모달 Modal -->
+<div th:fragment="modal(addFolder)">
+  <div id="modal_3" class="de-modal">
+    <div class="modal-content modal_w500">
+      <span class="close" onclick="modal_onoff(3, 2)">
+        <span class="material-symbols-outlined">close</span>
+      </span>
+      <p class="modal-title">폴더 추가</p>
+      <div class="modal-body">
+        <ul class="modal-list">
+          <li>
+            <label class="" for="folderName">폴더 명</label>
+            <input id="folderName" name="folderName" type="text" class="input_txt" placeholder="폴더 명을 입력하세요.">
+          </li>
+        </ul>
+          <div class="btn_al_r">
+            <button type="button" class="btn_cancel" onclick="modal_onoff(3, 2)">취소</button>
+            <button type="button" class="btn_join" id="" name=""  onclick="addFolder()">추가</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- //Modal -->
+
+
+

@@ -1,0 +1,23 @@
+/* 겉면 굵은선 */
+.ck-content .table table {
+    border: 2px solid black;
+    text-align: center;
+}
+
+/* 검은선 */
+.ck-content .table table td,
+.ck-content .table table th {
+    border: 1px solid black;
+    height: 5vh;
+    min-width: 100px;
+    width: 10vw;
+    text-align: center;
+}
+
+.doc_type_submit_btn {
+    margin: 1em;
+    display: flex;
+    justify-content: center;
+}
+
+.ck.ck-editor{width: 100%; }

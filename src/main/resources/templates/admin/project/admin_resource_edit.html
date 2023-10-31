@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet" />
+  <link href="/css/listbox.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    let projNo = [[${project.projectNo}]];
+    let month = [[${month}]];
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_project.html");
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu_admin").load("/inc/topmenu_admin.html");
+    });
+  </script>
+  <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+  />
+  <style>
+    #resourceTbl td {
+      text-align: center;
+    }
+
+    label.cb_container.custom_cb_container {
+      padding-left: 0;
+      width: 18px;
+      height: 18px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu_admin"></div>
+  <div class="white_box">
+    <div id="leftmenu"></div>
+    <!--//leftmenu-->
+    <div class="content_box">
+      <p class="con_tit">투입공수 수정</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        프로젝트
+        <span class="material-symbols-outlined"> navigate_next </span>
+        투입공수
+      </div>
+      <div class="board_write">
+        <table class="tb_st2" summary="">
+          <caption></caption>
+          <colgroup>
+            <col width="15%" />
+            <col width="*%" />
+          </colgroup>
+          <tbody>
+          <tr>
+            <th>프로젝트</th>
+            <td th:text="${project.projectName}"></td>
+          </tr>
+          <tr>
+            <th>투입공수(계획)</th>
+            <td th:text="${project.projectManhour}"></td>
+          </tr>
+          <tr>
+            <th>투입인력(계획)</th>
+            <td th:text="${project.projectResources}"></td>
+          </tr>
+          </tbody>
+        </table>
+        <table id="resourceTbl" class="tb_st2" summary="">
+          <caption></caption>
+          <colgroup>
+            <col width="7%" />
+            <col width="7%" />
+            <col width="*" />
+            <col width="14%" />
+            <col width="14%" />
+            <col width="10%" />
+            <col width="10%" />
+            <col width="10%" />
+          </colgroup>
+          <tbody>
+          <tr>
+            <th>선택</th>
+            <th>No.</th>
+            <th>이름</th>
+            <th>투입시작</th>
+            <th>투입종료</th>
+            <th>투입기간(day)</th>
+            <th>참여율(%)</th>
+            <th>투입공수(M/M)</th>
+          </tr>
+          <tr th:each="resource, i : ${project.resources}">
+            <td>
+              <label class="cb_container custom_cb_container" th:for="${'checkbox-' + i.count}">
+                <input type="checkbox" th:id="${'checkbox-' + i.count}" th:value="${i.count}">
+                <span class="cb_checkmark"></span>
+              </label>
+            </td>
+            <td th:text="${i.count}">No.</td>
+            <td><input type="text" th:id="${'memberName-' + i.count}"
+                       th:value="${resource.memberName}"
+                       th:onfocus="|modal_pop(${i.count})|"
+                       class="input_txt" style="width: 100%;"
+                       autocomplete="off"></td>
+            <td><input type="date"
+                       th:value="${resource.resourceStartDate}"
+                       th:id="${'resourceStartDate-' + i.count}"
+                       th:onchange="|dateHandler(${i.count})|"
+                       style="width: 90%" class="date_choice" /></td>
+            <td><input type="date"
+                       th:value="${resource.resourceEndDate}"
+                       th:id="${'resourceEndDate-' + i.count}"
+                       th:onchange="|dateHandler(${i.count})|"
+                       style="width: 90%" class="date_choice" /></td>
+            <td><span th:id="${'resourceDuration-' + i.count}"
+                      th:text="${resource.resourceDuration}"></span></td>
+            <td><input type="text" th:value="${resource.resourceProgress}"
+                       th:id="${'resourceProgress-' + i.count}"
+                       th:onchange="|manhourHandler(${i.count})|"
+                       class="input_txt" style="width: 100%;" /></td>
+            <td><span th:id="${'manhour-' + i.count}"
+              th:text="${resource.resourceHours}"></span></td>
+          </tr>
+          <tr>
+            <th colspan="7">합계</th>
+            <td id="sum"></td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="btn_al_lr" id="resourceBtn">
+          <div class="al_l">
+            <button type="button" class="btn_sm gray" onclick="addRow()">
+              <span class="material-symbols-outlined">add</span> 행 추가</button>
+            <button type="button" class="btn_sm gray" onclick="deleteBtn()">
+              <span class="material-symbols-outlined">remove</span> 행 삭제</button>
+          </div>
+          <button type="button" class="btn_sm navy al_r" onclick="submitData(4)"> <span class="material-symbols-outlined">check_small</span> 등록</button>
+        </div>
+      </div>
+    </div>
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+
+<!-- 모달 영역 시작 -->
+<div id="myModal" class="modal">
+  <!-- Modal_1 -->
+  <div id="modal_1" class="de-modal">
+    <!--  <div id="modal_1" class="de-modal" style="display: block">-->
+    <div class="modal-content" style="width: 800px">
+              <span class="close" onclick="modal_on_off(1, 2)">
+                <span class="material-symbols-outlined"> close </span>
+              </span>
+      <p class="modal-title" id="modal-title">직원 지정</p>
+      <br />
+      <div style="margin: auto; width: 95%;">
+        <div style="display: flex">
+          <ul class="listbox" id="listbox-1">
+            <li class="list" th:each="dept : ${departmentList}"
+                th:value="${dept.departmentNo}" th:text="${dept.departmentName}"
+                onclick="handleListClick(this, 1)"></li>
+          </ul>
+          <ul class="listbox" id="listbox-2">
+            <th:block th:each="department : ${departmentList}">
+              <div th:id="${'group2-' + department.departmentNo}" style="display:none;">
+                <li class="list" th:if="${department.children.isEmpty()}">하위 팀이 없습니다.</li>
+                <th:block th:each="dept: ${department.children}">
+                  <li class="list" th:value="${dept.departmentNo}" th:text="${dept.departmentName}"
+                      onclick="handleListClick(this, 2)"></li>
+                </th:block>
+              </div>
+            </th:block>
+          </ul>
+
+          <!-- 모든 departmentList와 departmentList 하위의 members 출력 -->
+          <ul class="listbox" id="listbox-3">
+            <th:block th:each="dept : ${departmentList}">
+              <div th:id="${'group3-' + dept.departmentNo}" style="display:none;">
+                <li class="list" th:each="member : ${dept.members}"
+                    th:value="${member.memberName}" th:text="${member.memberName}"
+                    onclick="changeItemClass(this, 3)"></li>
+              </div>
+              <th:block th:each="childDept : ${dept.children}">
+                <div th:id="${'group3-' + childDept.departmentNo}" style="display:none;">
+                  <li class="list" th:each="member : ${childDept.members}"
+                      th:value="${member.memberName}" th:text="${member.memberName}"
+                      onclick="changeItemClass(this, 3)"></li>
+                </div>
+              </th:block>
+            </th:block>
+          </ul>
+        </div>
+        <button type="button" class="btn_md navy" onclick="nameHandler()" style="display: flex; margin: 9px 9px 20px auto;">등록</button>
+      </div>
+    </div>
+  </div>
+  <!-- //Modal_1 -->
+</div>
+<script src="/js/project/addProjResource.js"></script>
+</body>
+</html>

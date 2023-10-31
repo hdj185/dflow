@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_project.html");
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu_admin").load("/inc/topmenu_admin.html");
+    });
+  </script>
+  <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+  />
+  <link
+          href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.css"
+          rel="stylesheet"
+          type="text/css"
+  />
+  <script src="../../../static/js/approval/approvalRegister.js"></script>
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu_admin"></div>
+  <div class="white_box">
+    <div id="leftmenu"></div>
+    <!--//leftmenu-->
+    <div class="content_box">
+      <p class="con_tit">투입공수 관리</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        프로젝트 관리
+        <span class="material-symbols-outlined"> navigate_next </span>
+        투입공수 관리
+      </div>
+      <form id="projForm" th:action="@{/admin/project/selResource}" method="get">
+        <div class="search_box" style="text-align: center">
+          <div class="row" style="width: auto; float: right; margin: 5px 0px">
+            <span class="sb_txt">프로젝트</span>
+            <!--    프로젝트 검색 조건 필드 영역 시작    -->
+            <!--    구분코드 영역 시작    -->
+            <div class="select_mate"
+                 data-mate-select="active"
+                 style="width: 145px">
+              <select name="projectType" id="projectType" onchange="" onclick="return false;">
+                <option disabled selected value="">구분코드</option>
+                <option th:each="code : ${typeCodes}"
+                        th:selected="${searchInfo.projectType == code.codeAccount}" th:text="${code.codeAccount}"
+                        th:value="${code.codeAccount}"></option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span class="icon_select_mate" onclick="open_select(this)">
+                                <span class="material-symbols-outlined">
+                                  keyboard_arrow_down
+                                </span>
+                              </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+            <!--    구분코드 영역 종료    -->
+            <!--    진행상태 영역 시작    -->
+            <div class="select_mate"
+                 data-mate-select="active"
+                 style="width: 145px">
+              <select name="projectState" id="projectState" onchange="" onclick="return false;">
+                <option disabled selected value="">진행상태</option>
+                <option th:each="state : ${stateCodes}"
+                        th:selected="${searchInfo.projectState == state.codeAccount}" th:text="${state.codeAccount}"
+                        th:value="${state.codeAccount}"></option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span class="icon_select_mate" onclick="open_select(this)">
+                                <span class="material-symbols-outlined">
+                                  keyboard_arrow_down
+                                </span>
+                              </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+            <!--    진행상태 영역 종료    -->
+            <div
+                    class="select_mate"
+                    data-mate-select="active"
+                    style="width: 145px"
+            >
+              <select name="keywordType" id="keywordType" onchange="" onclick="return false;">
+                <option disabled selected value="">선택</option>
+                <option th:selected="${searchInfo.keywordType == '프로젝트명'}" value="프로젝트명">프로젝트명
+                </option>
+                <option th:selected="${searchInfo.keywordType == '설명'}" value="설명">프로젝트 설명</option>
+                <option th:selected="${searchInfo.keywordType == '투입인력'}" value="투입인력">투입인력</option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span class="icon_select_mate" onclick="open_select(this)">
+                                <span class="material-symbols-outlined">
+                                  keyboard_arrow_down
+                                </span>
+                              </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+            <!--    프로젝트 검색 조건 필드 영역 끝    -->
+            <label for="search_txt"></label>
+            <input
+                    class="search_txt"
+                    id="search_txt"
+                    name="keyword"
+                    placeholder="검색어를 입력해주세요."
+                    style="width: 352px; margin-right: 3px;"
+                    th:value="${searchInfo.keyword}"
+                    type="text"
+            />
+            <button class="btn_search" title="검색" type="submit" onclick="return validateSearchOp()">검색</button>
+          </div>
+          <div class="row" style="width: auto; float: right; margin: 5px 0px">
+            <span class="sb_txt">검색기간</span>
+            <label for="startDate"></label>
+            <input class="date_choice" id="startDate" name="startDate" style="width:235px;"
+                   th:value="${searchInfo.getStartDate()}" type="date"/>
+            <span class="sb_txt">~</span>
+            <label for="endDate"></label>
+            <input class="date_choice" id="endDate" name="endDate" style="width:235px;"
+                   th:value="${searchInfo.getEndDate()}" type="date"/>
+            <button class="month_choice" onclick="dateBtnHandler(3)" style="width:85px;" title="3개월"
+                    type="button">
+              3개월
+            </button>
+            <button class="month_choice" onclick="dateBtnHandler(6)" style="width:85px;" title="6개월"
+                    type="button">
+              6개월
+            </button>
+            <button class="month_choice" onclick="dateBtnHandler(12)" style="width:85px; margin-right: 77px;" title="12개월"
+                    type="button">
+              12개월
+            </button>
+          </div>
+        </div>
+        <!--//search_box-->
+        <div class="table_top">
+          <div class="tb_left">총 <span th:text="${totalCount}">2525</span>건</div>
+          <div class="tb_right">
+            <div
+                    class="select_mate"
+                    data-mate-select="active"
+                    style="width: 145px"
+            >
+              <select name="sortType" onchange="submitForm()" onclick="return false;">
+                <option value="desc" th:selected="${sortType == 'desc'}">최신순</option>
+                <option value="asc" th:selected="${sortType == 'asc'}">과거순</option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span onclick="open_select(this)" class="icon_select_mate">
+                  <span class="material-symbols-outlined">
+                    keyboard_arrow_down
+                  </span>
+                </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+            <div
+                    class="select_mate"
+                    data-mate-select="active"
+                    style="width: 145px"
+            >
+              <select name="pageSize" onchange="submitForm()" onclick="return false;">
+                <option value="20" th:selected="${pageSize == 20}">20개</option>
+                <option value="50" th:selected="${pageSize == 50}">50개</option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span onclick="open_select(this)" class="icon_select_mate">
+                  <span class="material-symbols-outlined">
+                    keyboard_arrow_down
+                  </span>
+                </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--//table_top-->
+      </form>
+      <table class="tb_st1 l_line" summary="">
+        <caption></caption>
+        <colgroup>
+          <col width="5%" />
+          <col width="5%" />
+          <col width="*" />
+          <col width="*" />
+          <col width="5%" />
+          <col width="5%" />
+          <col width="5%" />
+          <col width="5%" />
+          <col width="5%" />
+        </colgroup>
+        <thead>
+        <tr>
+          <th rowspan="2">No.</th>
+          <th rowspan="2">구분</th>
+          <th rowspan="2">프로젝트명</th>
+          <th rowspan="2">투입인력</th>
+          <th colspan="2">계획</th>
+          <th colspan="2">수행</th>
+          <th rowspan="2">차이<br>(계획대비)</th>
+        </tr>
+        <tr>
+          <th>투입인력</th>
+          <th>투입공수</th>
+          <th>투입인력</th>
+          <th>투입공수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="resource : ${projResourceList}"
+            th:if="${totalCount > 0}"
+            th:onclick="|location.href='@{/admin/project/udtResource/}${resource.projNo}'|"
+            style="cursor: pointer">
+          <td th:text="${resource.projNo}">999</td>
+          <td th:text="${resource.projType}">SM</td>
+          <td th:text="${resource.projName}">창원대 코드하우스 프로젝트</td>
+          <td th:text="${resource.projMembers}">홍길동, 이순신, 김대한, 아이유</td>
+          <td th:text="${resource.plannedResources}">4</td>
+          <td th:text="${resource.plannedManhour}">32.2</td>
+          <td th:text="${resource.performedResources}">4</td>
+          <td th:text="${resource.performedManhour}">22.2</td>
+          <td><span th:class="${resource.manhourDefference < 0 ?  'fc_red' : (resource.manhourDefference > 0 ? 'fc_blue' : '')}" th:text="${resource.manhourDefference}">진행</span></td>
+        </tr>
+        <tr th:if="${totalCount == 0}">
+          <td colspan="10" style="text-align: center;">검색 결과가 없습니다.</td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <ul>
+          <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+            <a th:href="@{/admin/project/selResource/(page=${pageInfo.startPage}, startDate=${searchInfo.startDate}, endDate=${searchInfo.endDate}, projectType=${searchInfo.projectType}, projectState=${searchInfo.projectState}, keywordType=${searchInfo.keywordType}, keyword=${searchInfo.keyword}, sortType=${sortType}, pageSize=${pageSize})}"
+               class="start_page" title="처음페이지">
+              <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+            </a>
+          </li>
+          <li th:if="${pageInfo.nowPage > pageInfo.startPage}">
+            <a th:href="@{/admin/project/selResource/(page=${pageInfo.nowPage - 1}, startDate=${searchInfo.startDate}, endDate=${searchInfo.endDate}, projectType=${searchInfo.projectType}, projectState=${searchInfo.projectState}, keywordType=${searchInfo.keywordType}, keyword=${searchInfo.keyword}, sortType=${sortType}, pageSize=${pageSize})}"
+               class="pre_page" title="이전페이지">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </a>
+          </li>
+          <li th:if="${pageInfo.lastPage > 0}" th:each="page : ${#numbers.sequence(pageInfo.firstPage, pageInfo.lastPage)}">
+            <a th:href="@{/admin/project/selResource/(page=${page}, startDate=${searchInfo.startDate}, endDate=${searchInfo.endDate}, projectType=${searchInfo.projectType}, projectState=${searchInfo.projectState}, keywordType=${searchInfo.keywordType}, keyword=${searchInfo.keyword}, sortType=${sortType}, pageSize=${pageSize})}"
+               th:classappend="${page == pageInfo.nowPage} ? 'present'" th:text="${page}">3</a>
+          </li>
+          <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+            <a th:href="@{/admin/project/selResource/(page=${pageInfo.nowPage + 1}, startDate=${searchInfo.startDate}, endDate=${searchInfo.endDate}, projectType=${searchInfo.projectType}, projectState=${searchInfo.projectState}, keywordType=${searchInfo.keywordType}, keyword=${searchInfo.keyword}, sortType=${sortType}, pageSize=${pageSize})}"
+               class="next_page" title="다음페이지">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </a>
+          </li>
+          <li th:if="${pageInfo.nowPage < pageInfo.endPage}">
+            <a th:href="@{/admin/project/selResource/(page=${pageInfo.endPage}, startDate=${searchInfo.startDate}, endDate=${searchInfo.endDate}, projectType=${searchInfo.projectType}, projectState=${searchInfo.projectState}, keywordType=${searchInfo.keywordType}, keyword=${searchInfo.keyword}, sortType=${sortType}, pageSize=${pageSize})}"
+               class="end_page" title="끝페이지">
+              <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div style="width: 100%; display: inline-block; text-align: right;">
+        <button type="button" class="btn_sm navy" onclick="location.href='/admin/project/insResource'">
+          <span class="material-symbols-outlined">add</span>  추가</button>
+      </div>
+    </div>
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+<script src="/js/project/projectList.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="leftmenu" class="leftmenu" id="leftmenu">
+  <ul>
+    <li>
+      <p>
+        <a href="/project/selProjectMain">프로젝트</a>
+      </p>
+    </li>
+    <li>
+      <p>
+        <a href="/project/selResource">투입공수</a>
+      </p>
+    </li>
+  </ul>
+
+    <script>
+        // 선택된 button 인덱스
+        let sideButtonIndex = 0;
+
+        if(currentPath.startsWith('/project/selProjectMain')
+            || currentPath.startsWith('/project/insProjectMain')
+            || currentPath.startsWith('/project/udtProjectMain')) {
+            sideButtonIndex = 1;
+        } else if(currentPath.startsWith('/project/selResource')
+            || currentPath.startsWith('/project/insResource')
+            || currentPath.startsWith('/project/udtResource')) {
+            sideButtonIndex = 2;
+        }
+
+        //ul 요소 선택
+        if(sideButtonIndex > 0) {
+            const p = document.querySelector('div#leftmenu ul li:nth-child(' + sideButtonIndex +') p');
+            p.classList.add('depth1_active');
+        }
+    </script>
+</div>

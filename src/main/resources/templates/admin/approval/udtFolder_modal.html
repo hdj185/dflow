@@ -1,0 +1,32 @@
+<!--폴더 추가 모달 Modal -->
+<div th:fragment="modal(udtFolder)">
+  <div id="modal_4" class="de-modal">
+    <div class="modal-content modal_w500">
+      <span class="close" onclick="modal_onoff(4, 2)">
+        <span class="material-symbols-outlined">close</span>
+      </span>
+      <p class="modal-title">폴더 변경</p>
+      <br>
+      <div class="member_join">
+          <ul>
+            <li style="display: flex; align-items: center; justify-content: space-between;">
+              <label for="folder">폴더 명 : </label>
+              <input id="folder" name="folderName" type="text" class="input_txt" placeholder="폴더 명을 입력해주세요." style="width: 80%;">
+              <input id="folderNo" name="folderName" type="text" class="input_txt" style="display: none">
+            </li>
+          </ul>
+          <div>
+            <div class="btn_al_r">
+              <button type="button" class="btn_cancel" onclick="modal_onoff(4, 2)">취소</button>
+              <button type="button" class="btn_join" id="" name=""  onclick="udtFolderName()">수정</button>
+            </div>
+          </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- //Modal -->
+
+
+

@@ -1,0 +1,11 @@
+<!--   부서관리에  2계층 출력 하는 부분. 카드를 갈아 끼운다.   -->
+<tr th:each="allDepartmentList, iterStat  : ${departRespList}">
+  <td th:text="${allDepartmentList.memberNameKr}"></td>
+  <td th:text="${allDepartmentList.departmentName}"></td>
+  <td th:text="${allDepartmentList.staffName}"></td>
+  <td th:text="${allDepartmentList.updateDate}"></td>
+  <td th:text="${allDepartmentList.memberFlag}"></td>
+  <td> <button class="btn_md" type="button" th:onclick="'modal_onoff(1, 1); adminMemberModifyForm(\'' + ${allDepartmentList.memberNo} + '\')'">수정</button>
+</tr>
+
+

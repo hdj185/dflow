@@ -1,0 +1,32 @@
+<div class="leftmenu" id="leftmenu">
+  <ul>
+    <li>
+      <!--      <p class="depth1_active">-->
+      <p>
+        <a href="/admin/rollbook/selRollbook">근태관리</a>
+      </p>
+    </li>
+    <li>
+      <p>
+        <a href="/admin/rollbook/selAnnual">연차관리</a>
+      </p>
+    </li>
+  </ul>
+</div>
+
+<script>
+  // 현재 페이지의 URI 경로
+  const currentPath = window.location.pathname;
+  // 선택된 button 인덱스
+  let buttonIndex;
+
+  if(currentPath.startsWith('/admin/rollbook/selRollbook')) {
+    buttonIndex = 1;
+  } else if(currentPath.startsWith('/admin/rollbook/selAnnual')) {
+    buttonIndex = 2;
+  }
+
+  //ul 요소 선택
+  const p = document.querySelector('div#leftmenu ul li:nth-child(' + buttonIndex +') p');
+  p.classList.add('depth1_active');
+</script>

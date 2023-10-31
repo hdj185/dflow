@@ -1,0 +1,120 @@
+<div th:fragment="treeMenu(folderTreeRespList)">
+  <div class="treemenu">
+    <div class="treemenu_tit depth1_active">
+      <span> <a href="/admin/aprv/aprvMgt">전자 결재 관리</a></span>
+    </div>
+    <div class="treemenu_tit">
+      <span>문서 양식 관리</span>
+      <button type="button" class="btn_sm navy">추가</button>
+    </div>
+    <!--class="is-expandable" 추가시 하위메뉴 펼침-->
+    <!--open="" 추가시 펼쳐진 상태가 default-->
+    <nav class="tree-nav">
+      <details class="tree-nav__item is-expandable" open="" th:each="depth1 : ${folderTreeRespList}">
+        <summary class="tree-nav__item-title" th:text="${depth1.typeFolderName}"></summary>
+        <details class="tree-nav__item is-expandable" open="" th:each="depth2 : ${depth1.getChildren()}">
+          <summary class="tree-nav__item-title">
+            <span class="material-symbols-outlined">folder</span>
+            <span class="ellipsis" th:text="${depth2.typeFolderName}"></span>
+            <button type="button" class="btn_insert" title="수정하기">
+              <span class="material-symbols-outlined"> edit_square </span>
+            </button>
+            <button type="button" class="btn_delete" title="삭제하기">
+              <span class="material-symbols-outlined"> delete </span>
+            </button>
+          </summary>
+          <details class="tree-nav__item">
+            <summary class="tree-nav__item-title mg_l25">
+              <span class="material-symbols-outlined"> news </span>
+              <span class="ellipsis">3_Approval Request for Expenses</span>
+              <button type="button" class="btn_insert" title="수정하기">
+                        <span class="material-symbols-outlined">
+                          edit_square
+                        </span>
+              </button>
+              <button type="button" class="btn_delete" title="삭제하기">
+                <span class="material-symbols-outlined"> delete </span>
+              </button>
+            </summary>
+          </details>
+          <details class="tree-nav__item">
+            <summary class="tree-nav__item-title mg_l25">
+              <span class="material-symbols-outlined"> news </span>
+              <span class="ellipsis">3_메뉴</span>
+              <button type="button" class="btn_insert" title="수정하기">
+                        <span class="material-symbols-outlined">
+                          edit_square
+                        </span>
+              </button>
+              <button type="button" class="btn_delete" title="삭제하기">
+                <span class="material-symbols-outlined"> delete </span>
+              </button>
+            </summary>
+          </details>
+          <details class="tree-nav__item">
+            <summary class="tree-nav__item-title mg_l25">
+              <span class="material-symbols-outlined"> news </span>
+              <span class="ellipsis">3_메뉴</span>
+              <button type="button" class="btn_insert" title="수정하기">
+                        <span class="material-symbols-outlined">
+                          edit_square
+                        </span>
+              </button>
+              <button type="button" class="btn_delete" title="삭제하기">
+                <span class="material-symbols-outlined"> delete </span>
+              </button>
+            </summary>
+          </details>
+        </details>
+        <div class="tree-nav__item">
+          <a class="tree-nav__item-title mg_l20">
+            <span class="material-symbols-outlined"> folder </span>
+            <span class="ellipsis">2_양식</span>
+            <button type="button" class="btn_insert" title="수정하기">
+              <span class="material-symbols-outlined"> edit_square </span>
+            </button>
+            <button type="button" class="btn_delete" title="삭제하기">
+              <span class="material-symbols-outlined"> delete </span>
+            </button>
+          </a>
+          <a class="tree-nav__item-title mg_l20">
+            <span class="material-symbols-outlined"> folder </span>
+            <span class="ellipsis">2_지원</span>
+            <button type="button" class="btn_insert" title="수정하기">
+              <span class="material-symbols-outlined"> edit_square </span>
+            </button>
+            <button type="button" class="btn_delete" title="삭제하기">
+              <span class="material-symbols-outlined"> delete </span>
+            </button>
+          </a>
+        </div>
+      </details>
+
+      <!--<details class="tree-nav__item is-expandable" open="">
+        <summary class="tree-nav__item-title">1111111</summary>
+        <div class="tree-nav__item">
+          <a class="tree-nav__item-title mg_l20">
+            <span class="material-symbols-outlined"> folder </span>
+            <span class="ellipsis">22222222222222222222</span>
+            <button type="button" class="btn_insert" title="수정하기">
+              <span class="material-symbols-outlined"> edit_square </span>
+            </button>
+            <button type="button" class="btn_delete" title="삭제하기">
+              <span class="material-symbols-outlined"> delete </span>
+            </button>
+          </a>
+          <a class="tree-nav__item-title mg_l20">
+            <span class="material-symbols-outlined"> folder </span>
+            <span class="ellipsis"> 2222222222</span>
+            <button type="button" class="btn_insert" title="수정하기">
+              <span class="material-symbols-outlined"> edit_square </span>
+            </button>
+            <button type="button" class="btn_delete" title="삭제하기">
+              <span class="material-symbols-outlined"> delete </span>
+            </button>
+          </a>
+        </div>
+      </details>-->
+    </nav>
+  </div>
+</div>

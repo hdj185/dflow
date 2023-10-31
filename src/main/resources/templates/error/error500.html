@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="명령어" />
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL" />
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명" />
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2" />
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="(주)뎁스" />
+  <meta property="og:description" content="(주)뎁스" />
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg" />
+  <meta property="og:url" content="http://www.mysite.com" />
+  <title>(주)뎁스</title>
+  <link href="/css/login.css" rel="stylesheet" />
+  <script src="/js/pageActions.js"></script>
+</head>
+<body style="background: #f5f6fa">
+<div class="error_wrap500">
+  <p class="error_tit">웹 사이트에서 페이지를 표시할 수 없습니다!</p>
+  <div class="error_txt">
+    시스템 서버 오류로 인해 지금은 해당 정보를 가져올 수 없습니다.<br />
+    나중에 다시 시도해주세요.
+  </div>
+  <div class="btn_al_cen">
+    <button type="button" class="btn_previouspage" onclick="goBack()">이전으로 이동</button>
+    <button type="button" class="btn_refresh" onclick="refreshPage()">새로고침(F5)</button>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="명령어" name="robots"/>
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link href="대표URL" rel="canonical"/>
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta content="페이지 설명" name="description"/>
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta content="keyword1, keyword2" name="keywords"/>
+  <!-- 소셜 미디어 공유 -->
+  <meta content="website" property="og:type"/>
+  <meta content="(주)뎁스" property="og:title"/>
+  <meta content="(주)뎁스" property="og:description"/>
+  <meta content="http://www.mysite.com/myimage.jpg" property="og:image"/>
+  <meta content="http://www.mysite.com" property="og:url"/>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet"/>
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu").load("/inc/topmenu.html");
+    });
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet"/>
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu"></div>
+  <div class="white_box">
+
+
+
+    <div class="organization">
+      <ul>
+        <li>
+          <p class="depth1 active" onclick="memberAllList()">
+            <a href="" onclick="return false">DEPS</a>
+          </p>
+          <div th:each="depth1 : ${deptTreeRespList}" onclick="depth1Click(this)">
+            <ul>
+              <li>
+                <p class="depth2" th:onclick="'upMemberList('+ ${depth1.getDepartmentNo} +')'" th:value="${depth1.getDepartmentNo()}">
+                  <a href="" onclick="return false" th:text="${depth1.getDepartmentName()}"><span class="material-symbols-outlined">expand_less</span></a>
+                </p>
+                <ul class="depth3" th:each="depth2 : ${depth1.getChildren()}" style="display:none; cursor: pointer">
+                  <li class="" th:if="${!depth2.isDepartmentFlag()}"><a th:onclick="'memberList(' + ${depth2.getDepartmentNo()} + ' )'"  th:text="${depth2.getDepartmentName()}" ></a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+    <!--//leftmenu-->
+
+    <form id="orgFrom" method="get" th:action="@{/org/selOrgMain}" onsubmit="return false;">
+    <div class="content_box">
+      <p class="con_tit">조직도</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        조직도
+      </div>
+      <div class="search_top">
+        <button class="btn_md_img navy excel" type="button" onclick="downloadExcel()">
+          엑셀 다운로드
+        </button>
+        <div class="search_right">
+          <div class="select_mate" data-mate-select="active" style="width: 80px">
+            <select id="searchType" name="type" onchange="" onclick="return false;">
+              <option value="np">전체</option>
+              <option value="n">이름</option>
+              <option value="p">연락처</option>
+            </select>
+            <p class="selecionado_opcion" onclick="open_select(this)"></p>
+            <span class="icon_select_mate" onclick="open_select(this)">
+                  <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                </span>
+            <div class="cont_list_select_mate">
+              <ul class="cont_select_int"></ul>
+            </div>
+          </div>
+          <input class="search_txt" id="search_keyword" name="keyword" placeholder="검색어를 입력해주세요." type="text"/>
+          <button class="btn_search" title="검색" type="submit" onclick="search()">검색</button>
+        </div>
+      </div>
+      <div class="profile_container">
+      <div class="profile_box">
+        <div class="profile_card" th:each="memberInfo : ${memberList}"
+             th:onclick="'memberInfoDetail(' + ${memberInfo.memberNo} + ')'">
+          <div class="profile_photo">
+            <img alt="사진" th:src="|${memberInfo.imgNo == null ? '/img/image.png' : '/files/images/' + memberInfo.imgNo}|"/>
+          </div>
+          <div class="profile_info">
+            <div class="profile_name" th:text="${memberInfo.memberNameKr}+' '+${memberInfo.staffName}"></div>
+            <p><span>소속</span> <span>|</span> <span th:text="${memberInfo.departmentName}"></span></p>
+            <p><span>연락처</span> <span>|</span><span th:text="${memberInfo.memberPhone}"></span></p>
+            <p><span>이메일</span> <span>|</span><span th:text="${memberInfo.memberEmail}"></span></p>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    </form>
+
+    <!--//content_box-->
+  </div>
+
+  <!--//white_box-->
+</div>
+
+<!--//s_container-->
+<!-- Modal -->
+<div id="modal_1" class="de-modal">
+  <div class="modal-content modal_w1090">
+          <span class="close" onclick="modal_onoff(1,2)">
+            <span class="material-symbols-outlined"> close </span>
+          </span>
+    <p class="modal-title">직원 상세 정보</p>
+    <div class="member_join">
+      <div class="user_photo">
+        <div class="photo_box">
+          <img id="img"  alt="사진" />
+        </div>
+      </div>
+      <div class="user_info">
+        <ul>
+          <li>
+            <label for="department_name">부서</label>
+            <input id="department_name" type="text" disabled>
+
+          </li>
+          <li>
+            <label for="staff_name">직책</label>
+            <input id="staff_name" type="text" disabled>
+
+          </li>
+          <li>
+            <label for="member_enable_date">입사일</label>
+            <input type="text" id="member_enable_date" disabled />
+          </li>
+          <li>
+            <label for="member_gender">성별</label>
+            <input id="member_gender" type="text" disabled>
+
+          </li>
+          <li>
+            <label for="member_name_kr">한글이름</label>
+            <input type="text" id="member_name_kr" disabled />
+          </li>
+          <li>
+            <label for="member_birthdate">생년월일</label>
+            <input type="text" id="member_birthdate" disabled  />
+          </li>
+          <li>
+            <label for="member_name_cn">한문이름</label>
+            <input type="text" id="member_name_cn" disabled />
+          </li>
+          <li>
+            <label for="member_phone">연락처</label>
+            <input
+                    type="text"
+                    id="member_phone"
+                    disabled
+            />
+          </li>
+          <li>
+            <label for="member_name_en">영문이름</label>
+            <input
+                    type="text"
+                    id="member_name_en"
+                    disabled
+            />
+          </li>
+          <li>
+            <label for="member_email">이메일</label>
+            <input
+                    type="text"
+                    id="member_email"
+                    disabled
+            />
+          </li>
+          <li class="w100">
+            <label for="member_address">주소</label>
+            <input
+                    type="text"
+                    id="member_address"
+                    disabled
+            />
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- //Modal -->
+</body>
+<script th:inline="javascript">
+  let urlList = [[${urlList}]];
+  let excelData = [[${memberList}]];
+</script>
+<script src="/js/organization/organization.js"></script>
+<!--<script src="/js/organization/orgAjax.js" type="module"></script>-->
+</html>

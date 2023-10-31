@@ -1,0 +1,134 @@
+<div class="leftmenu">
+  <ul>
+    <li>
+      <p>
+        <a href="#" id="link-1" onclick="updown(this)">기안문서작성
+          <span class="material-symbols-outlined">expand_more</span>
+          <input hidden="hidden" class="check" value="1">
+        </a>
+      </p>
+      <ul id="1" style="display: none;">
+        <li id="li-1-1"><a href="/aprv/aprvReg">신규작성</a></li>
+        <li id="li-1-2"><a href="/aprv/aprvTempMain">임시저장문서</a></li>
+      </ul>
+    </li>
+    <li>
+      <p>
+        <a href="#" id="link-2" onclick="updown(this)">결재함
+          <span class="material-symbols-outlined">expand_more</span>
+          <input hidden="hidden" class="check" value="2">
+        </a>
+      </p>
+      <ul id="2" style="display: none;">
+        <li id="li-2-1"><a href="/aprv/selDocAprv/main">전체문서</a></li>
+<!--        <li id="li-2-2"><a onclick="progressD()">진행문서</a></li>-->
+        <li id="li-2-2"><a href="/aprv/selDocAprv/progress">진행문서</a></li>
+        <li id="li-2-3"><a href="/aprv/selDocAprv/pending">대기문서</a></li>
+        <li id="li-2-4"><a href="/aprv/selDocAprv/cancel">반려/회수문서</a></li>
+        <li id="li-2-5"><a href="/aprv/selDocAprv/completed">완료문서</a></li>
+        <li id="li-2-6"><a href="/aprv/selDocAprv/ref">참조문서</a></li>
+      </ul>
+    </li>
+    <li>
+      <p>
+        <a href="#" id="link-3" onclick="updown(this)">설정
+          <span class="material-symbols-outlined">expand_more</span>
+          <input hidden="hidden" class="check" value="3">
+        </a>
+      </p>
+      <ul id="3" style="display: none;">
+        <li id="li-3-1"><a href="/aprv/aprvSign">서명관리</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+
+
+<script>
+
+// 현재 페이지의 URI 경로
+  const currentPath = window.location.pathname;
+  // 선택된 button 인덱스
+  let buttonIndex = 0;
+  let liIndex = 0;
+
+  if (currentPath.startsWith('/aprv/aprvReg') || currentPath.startsWith('/aprv/aprvTempMain')) {
+    buttonIndex = 1;
+
+    if(currentPath.startsWith('/aprv/aprvTempMain'))
+      liIndex = 2;
+
+    else liIndex = 1;
+
+  } else if (currentPath.startsWith('/aprv/selDocAprv/main') || currentPath.startsWith('/aprv/selDocAprv/progress')
+          ||currentPath.startsWith('/aprv/selDocAprv/pending') || currentPath.startsWith('/aprv/selDocAprv/cancel')
+          ||currentPath.startsWith('/aprv/selDocAprv/completed') || currentPath.startsWith('/aprv/selDocAprv/ref')) {
+    buttonIndex = 2;
+
+    if (currentPath.startsWith('/aprv/selDocAprv/progress'))
+      liIndex = 2;
+
+    else if (currentPath.startsWith('/aprv/selDocAprv/pending'))
+      liIndex = 3;
+
+    else if(currentPath.startsWith('/aprv/selDocAprv/cancel'))
+      liIndex = 4;
+
+    else if(currentPath.startsWith('/aprv/selDocAprv/completed'))
+      liIndex = 5;
+
+    else if(currentPath.startsWith('/aprv/selDocAprv/ref'))
+      liIndex = 6;
+
+      else liIndex = 1;
+
+
+  }else if (currentPath.startsWith('/aprv/aprvSign')) {
+    buttonIndex = 3;
+    liIndex = 1;
+  }
+
+  if(buttonIndex > 0) {
+    //ul 요소 선택
+    const p = document.querySelector('div.leftmenu ul li:nth-child(' + buttonIndex + ') p');
+    if (p) {
+      p.classList.add('depth1_active');
+    }
+
+    //하위 토글 열기
+    updown(document.getElementById("link-" + buttonIndex));
+    if(liIndex > 0) {
+      const li = document.getElementById("li-" + buttonIndex + "-" + liIndex);
+      if(li)
+        li.classList.add('depth2_active');
+    }
+  }
+
+  function updown(element) {
+    // Find the span element with the class "material-symbols-outlined" inside the clicked element
+    let expandSpan = element.querySelector('.material-symbols-outlined');
+    let checkSpan = element.querySelector('.check').value;
+
+
+
+    // Toggle "expand_more" and "expand_less"
+    if (expandSpan.textContent.trim() === 'expand_more') {
+      expandSpan.textContent = 'expand_less';
+      document.getElementById(checkSpan).style.display='block'
+    } else {
+      expandSpan.textContent = 'expand_more';
+      document.getElementById(checkSpan).style.display='none'
+
+    }
+  }
+
+  // const menuItems = document.querySelectorAll('.leftmenu p a');
+  // for (let i = 0; i < menuItems.length; i++) {
+  //   updown(menuItems[i]);
+  // }
+
+
+
+</script>
+<script src="/js/approval/docAprvMain.js"></script>

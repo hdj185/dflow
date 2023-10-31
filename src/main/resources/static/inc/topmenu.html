@@ -1,0 +1,36 @@
+<div id="topmenu"><div class="topmenu">
+    <ul>
+        <!--class="tm_active" 추가시 현재 선택된 메뉴-->
+        <li><a href="/aprv/aprvReg">전자결재</a></li>
+        <li><a href="/rollbook/selRollbook">근태/연차</a></li>
+        <li><a href="/project/selProjectMain">프로젝트</a></li>
+        <li><a href="/org/selOrgMain">조직도</a></li>
+        <li><a href="/board/selNoticeBoard">게시판</a></li>
+    </ul>
+</div>
+</div>
+
+<script>
+    // 현재 페이지의 URI 경로
+    const currentPath = window.location.pathname;
+    // 선택된 button 인덱스
+    let buttonIndex = 0;
+
+    if(currentPath.startsWith('/aprv/')) {
+        buttonIndex = 1;
+    } else if(currentPath.startsWith('/rollbook/')) {
+        buttonIndex = 2;
+    } else if(currentPath.startsWith('/project/')) {
+        buttonIndex = 3;
+    } else if(currentPath.startsWith('/org/')) {
+        buttonIndex = 4;
+    } else if(currentPath.startsWith('/board/')) {
+        buttonIndex = 5;
+    }
+
+    if(buttonIndex > 0) {
+        //ul 요소 선택
+        const li = document.querySelector('div#topmenu ul li:nth-child(' + buttonIndex + ')');
+        li.classList.add('tm_active');
+    }
+</script>

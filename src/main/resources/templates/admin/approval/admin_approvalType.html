@@ -1,0 +1,322 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="명령어">
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link rel="canonical" href="대표URL">
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta name="description" content="페이지 설명">
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta name="keywords" content="keyword1, keyword2">
+  <!-- 소셜 미디어 공유 -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="(주)뎁스">
+  <meta property="og:description" content="(주)뎁스">
+  <meta property="og:image" content="http://www.mysite.com/myimage.jpg">
+  <meta property="og:url" content="http://www.mysite.com">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <link href="/css/common.css" rel="stylesheet">
+  <link href="/css/listbox.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+  <script src="/js/common.js"></script>
+  <script src="/js/approval/adminDocTypeReg.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+<!--  <script src="https://cdn.ckeditor.com/ckeditor5/31.1.0/classic/ckeditor.js"></script>-->
+<!--  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/translations/ko.js"></script>-->
+  <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    //let menuList = [[${folderTreeRespList}]]
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu_admin").load("/inc/topmenu_admin.html");
+    });
+  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.css" rel="stylesheet" type="text/css">
+  <link href="/css/editor.css" rel="stylesheet">
+  <link href="/css/documentModal.css" rel="stylesheet">
+  <link href="/css/documentRegister.css" rel="stylesheet">
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+<div id="topmenu_admin"></div>
+  <div class="white_box">
+    <div  id="treeMenuContainer" th:replace="admin/approval/treemenu :: treeMenu(${folderTreeRespList})"></div>
+    <div class="content_box">
+      <p class="con_tit">문서양식관리</p>
+      <div class="location_box">
+        <span class="material-symbols-outlined"> home </span>
+        <span class="material-symbols-outlined"> navigate_next </span>
+        전자결재관리
+        <span class="material-symbols-outlined"> navigate_next </span>
+        문서양식관리
+      </div>
+      <ul class="document_form" id="changeCard" >
+        <li>
+          <label for="folderNo"><span>*</span>양식폴더</label>
+          <div id="folderSelect" class="select_mate" data-mate-select="active" style="width: calc(100% - 150px)" data-indx-select="0" data-selec-open="false">
+            <select name="folderNo" onchange="" onclick="return false;" id="folderNo">
+              <option value="0" selected>선택</option>
+              <option th:each="folder : ${aprvFolders}"
+                      th:text="${folder.typeFolderName}"
+                      th:value="${folder.typeFolderNo}">
+              </option>
+            </select>
+            <p class="selecionado_opcion"  onclick="open_select(this)"></p>
+            <span class="icon_select_mate" onclick="open_select(this)">
+                                <span class="material-symbols-outlined">
+                                      keyboard_arrow_down
+                                </span>
+                            </span>
+            <div class="cont_list_select_mate">
+              <ul class="cont_select_int"></ul>
+            </div>
+          </div>
+        </li>
+        <li>
+          <label for="docFormUseFlag">표시여부</label>
+          <div class="select_mate" data-mate-select="active" style="width: calc(100% - 150px)" data-indx-select="1" data-selec-open="false">
+            <select name="docFormUseFlag" onchange="" onclick="return false;" id="docFormUseFlag">
+              <option th:each="code : ${ynCodes}"
+                      th:text="${code.codeAccount}"
+                      th:value="${code.codeName}">
+              </option>
+            </select>
+            <p class="selecionado_opcion" id="flagPtag" onclick="open_select(this)"></p>
+            <span class="icon_select_mate" onclick="open_select(this)">
+                                <span class="material-symbols-outlined">
+                                      keyboard_arrow_down
+                                </span>
+                            </span>
+            <div class="cont_list_select_mate">
+              <ul class="cont_select_int"></ul>
+            </div>
+          </div>
+        </li>
+        <li>
+          <label for="docFormCode"><span>*</span>양식코드</label>
+          <input type="text" id="docFormCode" name="docFormCode" maxlength='4' placeholder="영문대문자 4자리까지 입력 가능" onchange="validateSize()">
+        </li>
+        <li>
+          <label for="docFormName"><span>*</span>양식</label>
+            <input type="text" id="docFormName" name="docFormName" placeholder="양식을 입력해주세요.">
+        </li>
+
+      </ul>
+      <div class="btn_form">
+        <button type="button" class="btn_md navy" onclick="formReset()" style="margin-bottom: 15px;">새 양식</button>
+      </div>
+      <div class="form_editor" id="editor" style="width: 100%"></div>
+      <div class="doc_type_reg_btn">
+        <button type="button" class="btn_md navy" id="submitBtn">
+          <span class="material-symbols-outlined">task_alt</span>양식저장
+        </button>
+        <button type="button" class="btn_md navy" id="udtBtn" style="display: none">
+          <span class="material-symbols-outlined">task_alt</span>양식수정
+        </button>
+        <button type="button" class="btn_md gray al_r" id="previewBtn" onclick="clickPreviewBtn()">
+          <span class="material-symbols-outlined">pageview</span>미리보기
+        </button>
+      </div>
+    </div>
+    <div th:replace="admin/approval/folder_modal :: modal(addFolder)"></div>
+    <div th:replace="admin/approval/udtFolder_modal :: modal(udtFolder)"></div>
+    <div th:replace="admin/approval/docFormOrder_modal.html :: modal(docForm)"></div>
+
+    <script>
+      CKEDITOR.plugins.addExternal( 'tableresize', '/js/tableresize/', 'plugin.js' );
+      CKEDITOR.replace('editor', {
+        toolbarGroups : [
+          { name: 'clipboard', groups: [ 'undo', 'clipboard' ] },
+          { name: 'forms', groups: [ 'forms' ] },
+          { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+          { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+          '/',
+          { name: 'styles', groups: [ 'styles' ] },
+          { name: 'colors', groups: [ 'colors' ] },
+          { name: 'insert', groups: [ 'insert' ] },
+          { name: 'links', groups: [ 'links' ] },
+          { name: 'tools', groups: [ 'tools' ] },
+          { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+          { name: 'document', groups: [ 'document', 'mode', 'doctools' ] },
+          { name: 'others', groups: [ 'others' ] },
+          { name: 'about', groups: [ 'about' ] }
+        ],
+
+        removeButtons : 'Save,NewPage,Print,Scayt,Form,Checkbox,Radio,Textarea,Select,Button,ImageButton,HiddenField,SelectAll,Language,Flash,PageBreak,Iframe,Templates,Anchor,Link,Unlink,Preview,About,Cut,Copy,Paste,PasteText,PasteFromWord,Form,CopyFormatting,Blockquote,BidiLtr,BidiRtl,HorizontalRule,Smiley,SpecialChar,Maximize,ShowBlocks,Find,Replace',
+        extraPlugins: 'tableresize',
+        customConfig: '/js/tableresize/config.js'
+      });
+
+      function clickDocTypeSaveBtn() {
+        let content = CKEDITOR.instances.editor.getData().trim(); // 입력된 값의 앞뒤 공백 제거
+        //유효성 검사 넣기
+        saveDocType(content);
+      }
+
+      function clickDocTypeUdtBtn() {
+        let content = CKEDITOR.instances.editor.getData().trim(); // 입력된 값의 앞뒤 공백 제거
+        //유효성 검사 넣기
+        udtDocType(content);
+      }
+
+      //양식저장 버튼에 이벤트 넣어주기
+      var submitButton = document.getElementById('submitBtn');
+      submitButton.addEventListener('click', clickDocTypeSaveBtn);
+      var updateButton = document.getElementById('udtBtn');
+      updateButton.addEventListener('click', clickDocTypeUdtBtn);
+
+      //에디터 내용 set
+      function setData(content) {
+        CKEDITOR.instances.editor.setData(content);
+      }
+
+      //새 양식 set
+      function setNewForm() {
+        let newTbl = "<table class=\"document_tbl\" style='width: 100%'>\n" +
+                "<colgroup>\n" +
+                "<col width='20%'>\n" +
+                "<col width='*'>\n" +
+                "</colgroup>\n" +
+                "<tbody>\n" +
+                "<tr>\n" +
+                "<th>헤더</th>\n" +
+                "<td>내용</td>\n" +
+                "</tr>\n" +
+                "</tbody>\n" +
+                "</table>";
+
+        setData(newTbl);
+      }
+
+      //에디터 내용 불러오기
+      function getFormContent() {
+        return CKEDITOR.instances.editor.getData().trim();
+      }
+
+      setNewForm();
+    </script>
+
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+
+<!-- Modal -->
+<div id="modal_6" class="de-modal">
+  <div class="modal-content" style="width: 1400px;">
+          <span class="close" onclick="modal_onoff(6,2)">
+            <span class="material-symbols-outlined"> close </span>
+          </span>
+    <p class="modal-title">양식 미리보기</p>
+    <div class="print-modal-body">
+      <div class="doc_box">
+        <div id="docContent">
+          <div id="document_body">
+            <div id="document_header">
+              <p id="document_header_title" class="left-align letter-spacing-1">신청서</p>
+              <table class="right-align" id="approver-tbl">
+                <tr id="approver-staff">
+                  <td rowspan="2" style="line-height: 2em">결<br>재</td>
+                  <td>담　당</td>
+                </tr>
+                <tr id="approver-blank">
+                  <td id="drafter-box">
+                    <button type="button" class="btn_md gray">
+                      <span class="material-symbols-outlined"> add </span>
+                    </button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div id="document_container">
+              <div id="document_default_top">
+                <table class="document_tbl">
+                  <colgroup>
+                    <col width="20%">
+                    <col width="*">
+                  </colgroup>
+                  <tbody>
+                  <tr>
+                    <th>소　　속</th>
+                    <td th:text="${memberInfo.departmentName}"></td>
+                  </tr>
+                  <tr>
+                    <th>성　　명</th>
+                    <td th:text="${memberInfo.memberName}"></td>
+                  </tr>
+                  <tr>
+                    <th>직　　위</th>
+                    <td th:text="${memberInfo.staffName}"></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="document_content"></div>
+              <div id="document_default_bottom">
+                <table>
+                  <tr>
+                    <td style="text-align: center;"
+                        th:text="${#calendars.format(#calendars.createNow(), 'yyyy년 MM월 dd일')}">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="sign-box">
+                        <div>
+                          <p>소속:</p>
+                          <p>성명:</p>
+                        </div>
+                        <div style="text-align: center">
+                          <p th:text="${memberInfo.departmentName}">소:</p>
+                          <p th:text="${memberInfo.memberName}">성명</p>
+                        </div>
+                        <div id="sign_field"
+                             th:style="'background-image: url(' + (${memberInfo.signNo == null ? '' : '/files/images/' + memberInfo.signNo}) + ')'">
+                          <pre> </pre><p style="letter-spacing: 0">(인)</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- //Modal -->
+
+<script>
+  function validateSize() {
+    var docCode = document.getElementById('docFormCode').value;
+
+    if (docCode.length > 4 || !/^[A-Z]*$/.test(docCode)) {
+      alert_pop(1, "영문대문자 4자리까지 입력 가능");
+      return false;
+    }
+    return true;
+  }
+</script>
+
+</body>
+<script th:inline="javascript">
+  let urlList = [[${urlList}]];
+</script>
+<script src="/js/approval/aprvType.js"></script>
+</html>

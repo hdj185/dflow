@@ -1,0 +1,154 @@
+.document_tbl {
+    width: 100%;
+}
+
+.document_tbl th {
+    background: #f0f0f2;
+    color: #0a1032;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.document_tbl td {
+    color: #0a1032;
+    font-size: 16px;
+    font-weight: 400;
+    text-align: left;
+    border-left: none;
+    border-right: none;
+    line-height: 150%;
+}
+
+.document_tbl th, .document_tbl td {
+    padding: 15px;
+    border-bottom: solid 1px #0a1032;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.document_tbl th {
+    border-right: solid 1px #0a1032;
+    width: 20%;
+}
+
+#document_body {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#document_header {
+    display: flex;
+    justify-content: space-between;
+}
+
+#document_header table {
+    border: none;
+}
+
+#document_header td {
+    padding: 8px;
+    border: 1px solid #0a1032;
+    border-bottom: none;
+}
+
+#document_header th, #document_header td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#drafter-box {
+    height: 100px;
+    max-width: 100px;
+    min-width: 100px;
+}
+
+.approver-box {
+    max-width: 100px;
+    min-width: 100px;
+}
+
+#document_container {
+    border: 1px solid #0a1032;
+}
+
+#document_content table {
+    border: none;
+    margin-bottom: 5vh;
+}
+
+#document_content table, #document_default_bottom table {
+    width: 100%;
+}
+
+#document_content input {
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #c1c8e4;
+    background: #fff;
+}
+
+#document_content p {
+    margin-top: 10px;
+    text-align: left;
+}
+
+#document_default_bottom table {
+    border-top: none;
+}
+
+#document_default_bottom td {
+    border: none;
+    padding: 4vh;
+}
+
+.left-align {
+    text-align: left; /* 왼쪽 정렬 */
+    font-size: 30px;
+    vertical-align: bottom;
+    margin: 40px 0px 0px 40px
+}
+
+.right-align {
+    text-align: right; /* 오른쪽 정렬 */
+}
+
+.letter-spacing-1 {
+    letter-spacing: 1em;
+}
+
+.sign-box {
+    /*margin-left: 70%;*/
+    float: right;
+    letter-spacing: 1em;
+    line-height: 250%;
+    display: flex;
+}
+
+.sign-box div {
+    margin-right: 2em;
+}
+
+#sign_field {
+    width: 100px; /* 배경 영역의 가로 너비 설정 */
+    height: 100px; /* 배경 영역의 세로 높이 설정 */
+    background-size: cover; /* 이미지를 배경에 맞게 확대/축소하여 표시 */
+}
+
+.hidden-approver {
+    display: none;
+}
+
+.hidden-referrer {
+    display: none;
+}
+
+#annualLeavePeriod {
+    margin: auto 2em;
+}
+
+
+.current-user {
+    font-weight: bold;
+    color: green;
+}

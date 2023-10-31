@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="thhp://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div layout:fragment="content">
+  <style>
+    .asterisk {
+      color: #f64130;
+    }
+  </style>
+  <div th:replace="fragments/leftmenu/leftmenu_project :: leftmenu"></div>
+  <!--//leftmenu-->
+  <div class="content_box">
+    <p class="con_tit">프로젝트 등록</p>
+    <div class="location_box">
+      <span class="material-symbols-outlined"> home </span>
+      <span class="material-symbols-outlined"> navigate_next </span>
+      프로젝트
+      <span class="material-symbols-outlined"> navigate_next </span>
+      프로젝트
+    </div>
+    <div class="board_write">
+      <table class="tb_st2" summary="">
+        <caption></caption>
+        <colgroup>
+          <col width="15%" />
+          <col width="*%" />
+        </colgroup>
+        <tbody>
+        <tr>
+          <th>프로젝트 명<span class="asterisk"> *</span></th>
+          <td><input type="text" id="projectName" placeholder="" class="input_txt" /></td>
+        </tr>
+        <tr>
+          <th>프로젝트 설명<span class="asterisk"> *</span></th>
+          <td><textarea id="projectDescription" placeholder="내용 입력" style="height: 100px"></textarea></td>
+        </tr>
+        <tr>
+          <th>프로젝트 구분<span class="asterisk"> *</span></th>
+          <td>
+            <div class="select_mate" data-mate-select="active" style="width: 321.33px" data-indx-select="0" data-selec-open="false">
+              <select id="projectType" onchange="" onclick="return false;">
+                <option value="" selected>선택</option>
+                <option th:each="code : ${typeCodes}" th:value="${code.codeAccount}"
+                        th:text="${code.codeAccount}"></option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span onclick="open_select(this)" class="icon_select_mate">
+                                  <span class="material-symbols-outlined">
+                                    keyboard_arrow_down
+                                  </span>
+                                </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>시작일<span class="asterisk"> *</span></th>
+          <td><input type="date" id="projectStartDate" style="width: 300px" class="date_choice" /></td>
+        </tr>
+        <tr>
+          <th>종료일<span class="asterisk"> *</span></th>
+          <td><input type="date" id="projectEndDate" style="width: 300px" class="date_choice" /></td>
+        </tr>
+        <tr>
+          <th>프로젝트 상태<span class="asterisk"> *</span></th>
+          <td>
+            <div class="select_mate" data-mate-select="active" style="width: 321.33px" data-indx-select="0" data-selec-open="false">
+              <select id="projectState" onchange="" onclick="return false;">
+                <option value="" selected>선택</option>
+                <option th:each="state : ${stateCodes}" th:value="${state.codeAccount}"
+                        th:text="${state.codeAccount}">진행중</option>
+              </select>
+              <p class="selecionado_opcion" onclick="open_select(this)"></p>
+              <span onclick="open_select(this)" class="icon_select_mate">
+                                  <span class="material-symbols-outlined">
+                                    keyboard_arrow_down
+                                  </span>
+                                </span>
+              <div class="cont_list_select_mate">
+                <ul class="cont_select_int"></ul>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>진행률<span class="asterisk"> *</span></th>
+          <td>
+            <div class="percentage-input">
+              <input type="number" id="projectProgress" class="input_txt"
+                     min="0" max="100" onchange="progressListener()"
+                     style="width: 321.33px; text-align: right;"/>
+              <span class="percentage-symbol">%</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>투입공수<span class="asterisk"> *</span></th>
+          <td><input type="number" id="projectManhour" style="width: 321.33px; text-align: right; " placeholder="" class="input_txt" /></td>
+        </tr>
+        <tr>
+          <th>투입인력<span class="asterisk"> *</span></th>
+          <td><input type="number" id="projectResources" style="width: 321.33px; text-align: right;" placeholder="" class="input_txt" /></td>
+        </tr>
+        </tbody>
+      </table>
+      <table class="tb_st2" summary="">
+        <caption></caption>
+        <colgroup>
+          <col width="15%" />
+          <col width="*" />
+        </colgroup>
+        <tbody>
+        <tr>
+          <th>프로젝트 개요<span class="asterisk"> *</span></th>
+          <td><textarea id="projectOverview" placeholder="내용 입력" style="height: 100px"></textarea></td>
+        </tr>
+        <tr>
+          <th>프로젝트 목적<span class="asterisk"> *</span></th>
+          <td><textarea id="projectObjective" placeholder="내용 입력" style="height: 100px"></textarea></td>
+        </tr>
+        <tr>
+          <th>주요기능<span class="asterisk"> *</span></th>
+          <td><textarea id="projectFeatures" placeholder="내용 입력" style="height: 100px"></textarea></td>
+        </tr>
+        <tr>
+          <th>비고</th>
+          <td><input type="text" id="projectRemarks" placeholder="" class="input_txt" /></td>
+        </tr>
+        </tbody>
+      </table>
+      <p class="btn_al_r">
+        <button type="button" class="btn_md navy"
+                onclick="clickRegProjectBtn(1)"><span class="material-symbols-outlined">check</span> 등록</button>
+      </p>
+    </div>
+  </div>
+  <!--//content_box-->
+  <script src="/js/project/createProject.js"></script>
+</div>
+</html>

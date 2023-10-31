@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="topmenu" class="topmenu admin" id="topmenu admin">
+    <ul>
+      <!--class="tm_active" 추가시 현재 선택된 메뉴-->
+      <li><a href="/admin/aprv/aprvMgt">전자결재관리</a></li>
+      <li><a href="/admin/rollbook/selRollbook">근태관리</a></li>
+      <li><a href="/admin/project/selProjectMain">프로젝트관리</a></li>
+      <li><a href="/admin/org/selDepart">조직관리</a></li>
+      <li><a href="/admin/board/selNoticeBoard">게시판관리</a></li>
+      <li><a href="/admin/system/selAuthorization">시스템관리</a></li>
+    </ul>
+
+<script>
+
+  // 선택된 button 인덱스
+  let buttonIndex = 0;
+
+  if (currentPath.startsWith('/admin/aprv/')) {
+    buttonIndex = 1;
+  } else if (currentPath.startsWith('/admin/rollbook/')) {
+    buttonIndex = 2;
+  } else if (currentPath.startsWith('/admin/project/')) {
+    buttonIndex = 3;
+  } else if (currentPath.startsWith('/admin/org/')) {
+    buttonIndex = 4;
+  } else if (currentPath.startsWith('/admin/board/')) {
+    buttonIndex = 5;
+  } else if (currentPath.startsWith('/admin/system/')) {
+    buttonIndex = 6;
+  }
+
+  //ul 요소 선택
+  if(buttonIndex > 0) {
+      const li = document.querySelector('div.topmenu.admin ul li:nth-child(' + buttonIndex + ')');
+      li.classList.add('tm_active');
+  }
+</script>
+</div>
+</html>
+

@@ -1,0 +1,317 @@
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+<link href="/css/login.css" rel="stylesheet" />
+<script src="/js/common.js"></script>
+<script src="/js/modifyMember.js"></script>
+
+<div class="header_box">
+    <h1 class="t_logo">
+        <a href="/main/main"><img src="/img/logo.png" alt="주식회사 DEPS"></a>
+    </h1>
+    <div class="info_right">
+        <!--<span class="admin_user" id="admin_user"
+              onclick="location.href='/admin/aprv/aprvMgt'">관리자 페이지
+        </span>-->
+        <dv class="top_user_info">
+            <span class="user_name" style="margin-right: 0.5em">안녕하세요,</span>
+            <span id="header_user_name" class="user_name" style="margin-right: 0">홍길동</span>
+            <span class="user_name">님!</span>
+        </dv>
+        <button type="button"  class="admin_user" id="admin_user" onclick="location.href='/admin/aprv/aprvMgt'">
+            <span class="material-symbols-outlined">
+                manage_accounts
+                </span>
+            관리자
+        </button>
+        <div class="btn_box">
+            <!--            <button type="button" id="edit_member" onclick="modal_onoff(2, 1)">-->
+            <button type="button" id="edit_member" onclick="modifyMemberBtn()">
+                <span class="material-symbols-outlined"> edit_square </span>
+                내 정보 수정
+            </button>
+            <button type="button" id="logoutBtn">
+                <span class="material-symbols-outlined"> logout </span>
+                로그아웃
+            </button>
+        </div>
+    </div>
+</div>
+
+<!--alert sample-->
+<div class="alert_wrap" id="alert_wrap" style="display: none;">
+    <p><span class="material-symbols-outlined">
+            release_alert
+        </span> <span id="alert_span">입력하신 정보와 일치하지 않습니다.</span></p>
+    <div class="alert_btn_box">
+        <button type="button" id="alert_btn" onclick="alert_pop(2, '')">확인</button>
+    </div>
+</div>
+<!--alert sample-->
+<!--confirm sample-->
+<div class="alert_wrap" id="confirm_wrap" style="display: none;">
+    <p><span class="material-symbols-outlined">
+            release_alert
+        </span> <span id="confirm_span">입력하신 정보와 일치하지 않습니다.</span></p>
+    <div class="alert_btn_box">
+        <button type="button" id="confirm_btn">확인</button>
+        <button type="button" id="confirm_cancel_btn">취소</button>
+    </div>
+</div>
+<!--confirm sample-->
+
+<!-- Modal -->
+<div id="modal_2" class="de-modal">
+    <div class="modal-content modal_w1090">
+          <span class="close" onclick="modal_onoff(2, 2)">
+            <span class="material-symbols-outlined"> close </span>
+          </span>
+        <p class="modal-title">회원 정보 수정</p>
+        <form id="modifyMemberForm" action="/auth/modify" method="post" enctype="multipart/form-data">
+            <div class="member_join">
+                <div class="user_photo">
+                    <div class="photo_box">
+                        <img id="modify_photo_preview" />
+                    </div>
+                    <input type="file" name="memberImg" id="modify_photo_input" style="display: none" accept="image/*" />
+                    <button type="button" class="btn_file" onclick="modify_attachPhoto()">사진 첨부</button>
+                </div>
+                <div class="user_info">
+                    <ul>
+                        <li>
+                            <label for="modify_member_id">ID</label>
+                            <input
+                                    type="text"
+                                    id="modify_member_id"
+                                    name="memberId"
+                                    placeholder=""
+                                    readonly
+                            />
+                        </li>
+                        <li>
+                            <label for="modify_member_pw">PW</label>
+                            <input
+                                    type="password"
+                                    id="modify_member_pw"
+                                    name="password"
+                                    placeholder="현재 비밀번호를 입력하세요."
+                                    required
+                            />
+                        </li>
+                        <li>
+                            <label for="modify_member_name_kr">한글이름</label>
+                            <input type="text" name="memberNameKr" id="modify_member_name_kr" placeholder="" readonly />
+                        </li>
+                        <li>
+                            <label for="modify_member_birthdate">생년월일</label>
+                            <input type="date" name="memberBirthdate" id="modify_member_birthdate" placeholder="" readonly />
+                        </li>
+                        <li>
+                            <label for="modify_member_name_cn">한문이름</label>
+                            <input type="text" name="memberNameCn" id="modify_member_name_cn" placeholder="" readonly />
+                        </li>
+                        <li>
+                            <label for="modify_member_phone">연락처</label>
+                            <input
+                                    type="text"
+                                    name="memberPhone"
+                                    id="modify_member_phone"
+                                    placeholder=""
+                                    required
+                            />
+                        </li>
+                        <li>
+                            <label for="modify_member_name_en">영문이름</label>
+                            <input
+                                    type="text"
+                                    name="memberNameEn"
+                                    id="modify_member_name_en"
+                                    placeholder=""
+                                    readonly
+                            />
+                        </li>
+                        <li>
+                            <label for="modify_member_email">이메일</label>
+                            <input
+                                    type="text"
+                                    name="memberEmail"
+                                    id="modify_member_email"
+                                    placeholder=""
+                            />
+                        </li>
+                        <li class="w100">
+                            <label for="modify_member_address">주소</label>
+                            <input
+                                    type="text"
+                                    name="memberAddress"
+                                    id="modify_member_address"
+                                    placeholder=""
+                            />
+                        </li>
+                        <li id="department-id">
+                            <label for="department">부서</label>
+                            <div
+                                    class="select_mate"
+                                    data-mate-select="active"
+                                    style="width: 294px"
+                            >
+                                <select name="departmentNo" onchange="" onclick="return false;" id="department">
+                                    <!--                                <option th:each="dept : ${deptList}" th:value="${dept.departmentNo}" th:text="${dept.departmentName}">부서</option>-->
+                                </select>
+                                <p
+                                        class="selecionado_opcion"
+                                        onclick="open_select(this)"
+                                ></p>
+                                <span onclick="open_select(this)" class="icon_select_mate">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                                <div class="cont_list_select_mate">
+                                    <ul class="cont_select_int"></ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <label for="staff">직책</label>
+                            <div
+                                    class="select_mate"
+                                    data-mate-select="active"
+                                    style="width: 294px"
+                            >
+                                <select name="staffNo" onchange="" onclick="return false;" id="staff">
+                                    <!--                                <option th:each="stf : ${stfList}" th:value="${stf.staffNo}" th:text="${stf.staffName}">직책</option>-->
+                                </select>
+                                <p
+                                        class="selecionado_opcion"
+                                        onclick="open_select(this)"
+                                ></p>
+                                <span onclick="open_select(this)" class="icon_select_mate">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                                <div class="cont_list_select_mate">
+                                    <ul class="cont_select_int"></ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <label for="modify_member_enable_date">입사일</label>
+                            <input type="date" name="memberEnableDate" id="modify_member_enable_date" readonly/>
+                        </li>
+                        <li>
+                            <label for="modify_member_leave_date">퇴사일</label>
+                            <input type="date" name="memberLeaveDate" id="modify_member_leave_date" disabled />
+                        </li>
+                        <li>
+                            <label for="modify_member_gender">성별</label>
+                            <div
+                                    class="select_mate"
+                                    data-mate-select="active"
+                                    style="width: 294px"
+                            >
+                                <select name="memberGender" onchange="" onclick="return false;" id="modify_member_gender" readonly>
+                                    <option value="남">남</option>
+                                    <option value="여">여</option>
+                                </select>
+                                <p
+                                        class="selecionado_opcion"
+                                        onclick="open_select(this)"
+                                ></p>
+                                <span onclick="open_select(this)" class="icon_select_mate">
+                      <span class="material-symbols-outlined">
+                        keyboard_arrow_down
+                      </span>
+                    </span>
+                                <div class="cont_list_select_mate">
+                                    <ul class="cont_select_int"></ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="btn_al_r">
+                        <button type="button" class="btn_cancel" onclick="modal_onoff(2, 2)">취소</button>
+                        <button type="button" class="btn_md gray logout" id="checkPwd" >
+                            <span class="material-symbols-outlined">key</span>비밀번호 변경
+                        </button>
+                        <button type="button" class="btn_join" id="modify_submit" onclick="modifySubmitBtn()">수정</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- //Modal -->
+
+<!-- 비밀번호 변경 모달 -->
+<div class="de-modal" id="modal_9">
+    <div class="modal-content modal_w500">
+        <span class="close" onclick="modal_onoff(9, 2)">
+            <span class="material-symbols-outlined"> close </span>
+        </span>
+        <p class="modal-title">비밀번호 재설정</p>
+        <br>
+        <div class="chPwForm">
+            <div class="changing">
+                <label for="change-password" style="font-weight: bold">변경할 비밀번호</label>
+                <input class="chPwInput" id="change-password" placeholder="변경할 비밀번호를 입력하세요."
+                       th:name="password" type="password">
+            </div>
+            <br>
+            <div class="confirming">
+                <label for="conf-password" style="font-weight: bold">비밀번호 확인</label>
+                <input class="confPwInput" id="conf-password" placeholder="입력한 비밀번호를 다시 입력하세요."
+                       th:name="conf-password" type="password">
+            </div>
+            <br>
+            <div class="changePwBtn">
+                <!--                <button class="btn bg-gradient-primary" id="pwUpdate" onclick="pwUpdate()"-->
+                <!--                        value="비밀번호 변경">비밀번호 변경-->
+                <!--                </button>-->
+                <button type="button" class="btn_md navy logout" id="pwUpdate" onclick="pwUpdate()"  value="비밀번호 변경">
+                    비밀번호 변경
+                </button>
+            </div>
+            <br>
+        </div>
+    </div>
+</div>
+<!-- //Modal_9 -->
+
+
+<script>
+    // 현재 페이지의 URI 경로
+    const currentPath = window.location.pathname;
+    // 선택된 button 인덱스
+    let hideAdmin = currentPath.startsWith('/admin/');
+
+    if (hideAdmin || userRole === 'ROLE_USER') {
+        document.getElementById('admin_user').style.display="none";
+    } else {
+        document.getElementById('admin_user').style.display="inline";
+    }
+
+    // 로그아웃 처리
+
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        $.ajax({
+            url: '/auth/logout',
+            type: 'POST',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function(result) {
+                // 로그아웃 성공 시 처리
+                window.location.href = '/auth/login';
+            }
+        });
+    });
+</script>
+<script src="/js/alert_handler.js"></script>
+
+
+

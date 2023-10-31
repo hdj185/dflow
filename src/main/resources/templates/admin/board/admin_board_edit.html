@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="명령어" name="robots"/>
+    <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+    <link href="대표URL" rel="canonical"/>
+    <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+    <meta content="페이지 설명" name="description"/>
+    <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+    <meta content="keyword1, keyword2" name="keywords"/>
+    <!-- 소셜 미디어 공유 -->
+    <meta content="website" property="og:type"/>
+    <meta content="(주)뎁스" property="og:title"/>
+    <meta content="(주)뎁스" property="og:description"/>
+    <meta content="http://www.mysite.com/myimage.jpg" property="og:image"/>
+    <meta content="http://www.mysite.com" property="og:url"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>(주)뎁스</title>
+    <link href="/css/common.css" rel="stylesheet"/>
+    <script src="/js/common.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!--  에디터 CDN  -->
+    <link
+            crossorigin="anonymous"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+            rel="stylesheet">
+
+    <script th:inline="javascript" type="text/javascript">
+        let username = [[${#authentication.principal.nickname}]];
+        let userRole = [[${#authentication.principal.authorities[0].authority}]];
+        let csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        let csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+    </script>
+    <script src="
+https://cdn.jsdelivr.net/npm/ckeditor5-build-classic-custom-simpleuploadadapter@28.0.0/build/ckeditor.min.js
+"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#header").load("/inc/header.html", function () {
+                // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+                $("#header_user_name").text(username);
+            });
+            $("#topmenu").load("/inc/topmenu_admin.html");
+            $("#leftmenu").load("/inc/leftmenu/leftmenu_admin_board.html");
+
+            ClassicEditor.create(document.querySelector('#input-content'), {
+                language: 'ko',
+                simpleUpload: {
+                    uploadUrl: '/files/editor/upload',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-CSRF-HEADER': csrfHeader
+                    }
+                }
+            }).then(editor => {
+                window.editor = editor;
+
+                // 작성완료 버튼의 onclick 이벤트 핸들러
+                function validateForm() {
+                    var content = editor.getData().trim(); // 입력된 값의 앞뒤 공백 제거
+
+                    console.log('content', content);
+                    if (content === '') {
+                        alert_pop(1, '내용을 입력하세요');
+                        return false; // 폼 제출 중지
+                    } else {
+                        update(content);
+                    }
+                }
+
+                // 작성완료 버튼 클릭 시 validateForm() 함수 호출
+                var udtBtn = document.getElementById('udtBtn');
+                udtBtn.addEventListener('click', validateForm);
+            }).catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+          rel="stylesheet"/>
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+    <div id="topmenu"></div>
+    <div class="white_box">
+        <div id="leftmenu"></div>
+        <!--//leftmenu-->
+        <div class="content_box">
+            <p class="con_tit">게시글 수정</p>
+            <div class="location_box">
+                <span class="material-symbols-outlined"> home </span>
+                <span class="material-symbols-outlined"> navigate_next </span>
+                게시판관리
+                <span class="material-symbols-outlined"> navigate_next </span>
+                게시글 수정
+            </div>
+            <div class="board_write" style="margin-top: 30px">
+                <ul class="write_list"
+                <li>
+                    <div class="w20"><label for="noticeDate" th:style="${board.boardNotice == 'Y' ? 'display: block;' : 'display: none;'}">공지기간</label>&nbsp;</div>
+                    <div class="w80">
+                        <div class="al_l"
+                             id="noticeDate" th:style="${board.boardNotice == 'Y' ? 'display: block;' : 'display: none;'}">
+                            <!--              <label for="noticeDateStart"></label>-->
+                            <input class="date_choice" id="noticeDateStart" name="noticeDateStart" onchange="validateNoticeDate()"
+                                   style="width: 300px;"
+                                   th:value="${board.noticeDateStart != null ? board.noticeDateStart : ''}"
+                                   type="date"/>
+                            <span class="sb_txt">~</span>
+                            <!--              <label for="noticeDateStart"></label>-->
+                            <input class="date_choice" id="noticeDateEnd" name="noticeDateEnd" onchange="validateNoticeDate()"
+                                   style="width: 300px;"
+                                   th:value="${board.noticeDateEnd != null ? board.noticeDateEnd : ''}"
+                                   type="date"/>
+                        </div>
+
+                        <div class="al_r">
+                            <label class="cb_container">
+                                공지사항 설정
+                                <input id="notice" name="notice" onchange="checkboxEventHandler()" th:checked="${board.boardNotice eq 'Y'}" th:value="${board.boardNotice eq 'Y' ? 'Y' : 'N'}" type="checkbox"/>
+                                <span class="cb_checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <label class="w20" for="title">제목</label>
+                    <input class="input_txt w80" id="title" name="title" placeholder="제목을 입력하세요" th:value="${board.boardTitle}" type="text"/>
+                </li>
+                <li>
+                    <label class="w20" for="input-content">내용</label>
+                    <div class="w80">
+                        <textarea id="input-content" style="width: calc(100% - 150px)" th:text="${board.boardContent}" th:value="${board.boardContent}"></textarea>
+                    </div>
+                </li>
+                <p class="btn_al_r">
+                    <button class="btn_md_img navy file" id="fileBtn" type="button">
+                        파일 첨부
+                    </button>
+                    <input hidden="none" id="files" multiple type="file">
+                </p>
+                <li id="file_box">
+                    <label for="file_box" class="w20">첨부파일</label>
+                    <dl class="w80">
+                        <dt><span>파일명</span><span>용량</span></dt>
+                        <dd class="upload_box">
+                            <th:block th:if="${fileList.size() == 0}">
+                                <ul class="ul_box">
+                                    <p class="attach_box"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus" viewBox="0 0 16 16">
+                                        <path d="M8 6.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 .5-.5z"/>
+                                        <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+                                    </svg>
+                                        파일을 마우스로 끌어 오세요
+                                    </p>
+                                </ul>
+                            </th:block>
+                            <th:block th:unless="${fileList.size() == 0}">
+                                <ul class="ul_box">
+                                    <li class="fileLi" th:each="fileList : ${fileList}">
+                                        <button class="btn_del" style="margin-right: 5px; float: left" th:onclick="'removeFile(event,'+${fileList.referenceFileNo}+')'" title="삭제하기" type="button">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                        <span class="file_tit" th:text="${fileList.fileOriginName}"></span>
+                                        <span class="file_byte" th:text="${fileList.fileSize}+' '+byte"></span>
+                                    </li>
+                                </ul>
+                            </th:block>
+                        </dd>
+                    </dl>
+                    <p class="btn_al_r">
+                        <button class="btn_md navy " id="udtBtn">게시글 수정</button>
+                    </p>
+                </li>
+                </ul>
+            </div>
+        </div>
+        <!--//content_box-->
+    </div>
+    <!--//white_box-->
+</div>
+<!--//s_container-->
+</body>
+<script th:inline="javascript">
+    let urlList = [[${urlList}]];
+    let boardNo = [[${board.boardNo}]];
+</script>
+<script src="/js/board/file.js"></script>
+<script src="/js/board/upload.js"></script>
+</html>

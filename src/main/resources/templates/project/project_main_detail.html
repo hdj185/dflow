@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="thhp://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div layout:fragment="content">
+  <script type="text/javascript" th:inline="javascript">
+    function deleteProject() {
+      let projectNo = [[${project.projectNo}]];
+
+      confirm_pop("정말로 삭제하시겠습니까?", function () {
+        let token = $("meta[name='_csrf']").attr("content");
+        let header = $("meta[name='_csrf_header']").attr("content");
+
+        fetch(`/project/delProjectMain/${projectNo}`, {
+          method: "DELETE",
+          headers: {
+            [header]: token
+          }
+        }).then(response => {
+          if (response.ok) {
+            alert_pop2(1, "프로젝트 삭제 완료하였습니다.", function () {
+              window.location.href = "/project/selProjectMain";
+            });
+          } else {
+            alert_pop(1, "삭제에 실패했습니다.");
+          }
+        }).catch(error => {
+          console.error("Error:", error);
+        });
+      });
+    }
+  </script>
+  <div th:replace="fragments/leftmenu/leftmenu_project :: leftmenu"></div>
+  <!--//leftmenu-->
+  <div class="content_box">
+    <p class="con_tit">프로젝트 상세</p>
+    <div class="location_box">
+      <span class="material-symbols-outlined"> home </span>
+      <span class="material-symbols-outlined"> navigate_next </span>
+      프로젝트
+      <span class="material-symbols-outlined"> navigate_next </span>
+      프로젝트
+    </div>
+    <table class="tb_st2" summary="">
+      <caption></caption>
+      <colgroup>
+        <col width="15%" />
+        <col width="35%" />
+        <col width="15%" />
+        <col width="35%" />
+      </colgroup>
+      <tbody>
+      <tr>
+        <th>프로젝트 명</th>
+        <td th:text="${project.projectName}">창원대 코드하우스 프로젝트</td>
+        <th>프로젝트 상태</th>
+        <td th:text="${project.projectState}">진행중</td>
+      </tr>
+      <tr>
+        <th>프로젝트 설명</th>
+        <td th:text="${project.projectDescription}">코딩아카데미 프로젝트팀 연계 그룹웨어 개발</td>
+        <th>진행률</th>
+        <td th:text="${project.projectProgress} + '%'">32%</td>
+      </tr>
+      <tr>
+        <th>시작일</th>
+        <td th:text="${project.projectStartDate}">2023-06-01</td>
+        <th>투입공수</th>
+        <td th:text="${project.projectManhour}">12</td>
+      </tr>
+      <tr>
+        <th>종료일</th>
+        <td th:text="${project.projectEndDate}">2023-06-01</td>
+        <th>투입인력</th>
+        <td th:text="${project.projectResources}">12</td>
+      </tr>
+      </tbody>
+    </table>
+    <table class="tb_st2" summary="">
+      <caption></caption>
+      <colgroup>
+        <col width="15%" />
+        <col width="*" />
+      </colgroup>
+      <tbody>
+      <tr>
+        <th>프로젝트 개요</th>
+        <td>
+          <textarea class="project_textarea" th:text="${project.projectOverview}" disabled />
+        </td>
+      </tr>
+      <tr>
+        <th>프로젝트 목적</th>
+        <td>
+          <textarea class="project_textarea"  th:text="${project.projectObjective}" disabled />
+        </td>
+      </tr>
+      <tr>
+        <th>주요기능</th>
+        <td>
+          <textarea class="project_textarea"  th:text="${project.projectFeatures}" disabled />
+        </td>
+      </tr>
+      <tr>
+        <th>참여인력</th>
+        <td th:text="${project.team}">
+          창원대 코드하우스 기업연계 프로젝트 수행 수요기반 기업주도형
+          셀 기반 프로젝트 운영으로 새로운 기업협력모델 도출 및 지역 내
+          IT/SW 개발을 위한 해결과 창원대 코드하우스 기업연계 프로젝트
+          수행 수요기반 기업주도형 셀 기반 프로젝트 운영으로 새로운
+          기업협력모델 도출 및 지역 내 IT/SW 개발을 위한 해결과 창원대
+          코드하우스 기업연계 프로젝트 수행 수요기반 기업주도형 셀 기반
+          프로젝트 운영으로 새로운 기업협력모델 도출 및 지역 내 IT/SW
+          개발을 위한 해결과
+        </td>
+      </tr>
+      <tr>
+        <th>비고</th>
+        <td th:text="${project.projectRemarks}">
+          창원대 코드하우스 기업연계 프로젝트 수행 수요기반 기업주도형
+          셀 기반 프로젝트 운영으로 새로운 기업협력모델 도출 및 지역 내
+          IT/SW 개발을 위한 해결과
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="btn_al_lr">
+      <button type="button" class="btn_sm gray al_l" onclick="location.href='/project/selProjectMain'">목록</button>
+      <div class="al_r">
+        <button type="button" class="btn_sm navy"
+                th:onclick="|location.href='@{/project/udtProjectMain/}${project.projectNo}'|">수정</button>
+        <button type="button" class="btn_sm navy hv_red" onclick="deleteProject()">삭제</button>
+      </div>
+    </div>
+  </div>
+  <!--//content_box-->
+</div>
+</html>

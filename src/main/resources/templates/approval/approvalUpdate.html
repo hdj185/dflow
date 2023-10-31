@@ -1,0 +1,172 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="명령어" name="robots">
+  <!-- 명령어 noindex : 해당 페이지는 검색 결과에서 제외 (반대는 index), nofollow : 검색로봇이 해당 페이지 내의 링크를 수집하지 않도록 설정(반대는 follow) -->
+  <link href="대표URL" rel="canonical">
+  <!-- 동일 콘텐츠를 여러 개의 URL로 표현이 가능할 경우 가장 선호되는 대표 URL을 지정, URL 표현시에는 상대 경로가 아닌 절대 경로를 사용 -->
+  <meta content="페이지 설명" name="description">
+  <!-- 페이지의 description 태그는 페이지의 콘텐츠에 대한 간략한 설명으로 1-2개의 문장으로 구성된 짧은 단락을 사용할 수 있습니다. 단, 2회 이상 반복적인 키워드, 스팸성 키워드, 사이트와 연관이 없는 키워드가 있는 경우 검색 노출에 불이익을 받을 수 있습니다. -->
+  <meta content="keyword1, keyword2" name="keywords">
+  <!-- 소셜 미디어 공유 -->
+  <meta content="website" property="og:type">
+  <meta content="(주)뎁스" property="og:title">
+  <meta content="(주)뎁스" property="og:description">
+  <meta content="http://www.mysite.com/myimage.jpg" property="og:image">
+  <meta content="http://www.mysite.com" property="og:url">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>(주)뎁스</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js" integrity="sha512-zYXldzJsDrNKV+odAwFYiDXV2Cy37cwizT+NkuiPGsa9X1dOz04eHvUWVuxaJ299GvcJT31ug2zO4itXBjFx4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link href="/css/common.css" rel="stylesheet">
+  <link href="/css/documentRegister.css" rel="stylesheet">
+  <link href="/css/listbox.css" rel="stylesheet" />
+  <script src="/js/common.js"></script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script type="text/javascript" th:inline="javascript">
+    let username = [[${#authentication.principal.nickname}]];
+    let userRole = [[${#authentication.principal.authorities[0].authority}]];
+    let signNo = [[${memberInfo.signNo}]];
+    let docNo = [[${docAprv.docNo}]];
+    let docFormNo = [[${docAprv.docFormNo}]];
+    let formCode = [[${docAprv.docFormCode}]];
+    let type = [[${type}]];
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#header").load("/inc/header.html", function() {
+        // AJAX 로드가 완료된 후에 실행되는 콜백 함수
+        $("#header_user_name").text(username);
+      });
+      $("#topmenu").load("/inc/topmenu.html");
+      $("#leftmenu").load("/inc/leftmenu/leftmenu_approval.html");
+      if(type === 'udt'){
+        fileAjax(docNo);
+      }
+      inputChange()
+      numberSet();
+
+    });
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+        rel="stylesheet">
+</head>
+<body>
+<div id="header"></div>
+<div class="s_container">
+  <div id="topmenu"></div>
+  <div class="white_box">
+    <div id="leftmenu"></div>
+    <!--//leftmenu-->
+    <div class="content_box">
+      <p class="con_tit">신규작성</p>
+      <div class="location_box">
+        <th:block th:if="${type.equals('temp')}">
+          <span class="material-symbols-outlined"> home </span>
+          <span class="material-symbols-outlined"> navigate_next </span>
+          전자결재
+          <span class="material-symbols-outlined"> navigate_next </span>
+          기안문서작성
+          <span class="material-symbols-outlined"> navigate_next </span>
+          <span class="location">임시문서 작성</span>
+        </th:block>
+        <th:block th:unless="${type.equals('temp')}">
+          <span class="material-symbols-outlined"> home </span>
+          <span class="material-symbols-outlined"> navigate_next </span>
+          전자결재
+          <span class="material-symbols-outlined"> navigate_next </span>
+          기안문서작성
+          <span class="material-symbols-outlined"> navigate_next </span>
+          <span class="location">문서 수정</span>
+        </th:block>
+      </div>
+      <div class="search_box">
+        <div style="float: left">
+          <input type="text" th:value="${docAprv.docFormName}">
+        </div>
+        <th:block th:if="${type.equals('temp')}">
+          <div style="float: right; display: block">
+            <button type="button" class="btn_md gray" onclick="docTempUdt()">임시저장</button>
+            <button type="button" class="btn_md navy" onclick="docTempUdtBtn()">문서등록</button>
+          </div>
+        </th:block>
+        <th:block th:unless="${type.equals('temp')}">
+          <div style="float: right; display: block">
+            <button type="button" class="btn_md navy" onclick="docUdtBtn()">문서 재등록</button>
+          </div>
+        </th:block>
+      </div>
+      <div th:utext="${docAprv.docContent}"  id="document_box" class="search_box" style="display: block">
+
+      </div>
+    </div>
+    <!--//content_box-->
+  </div>
+  <!--//white_box-->
+</div>
+<!--//s_container-->
+
+<!-- 모달 영역 시작 -->
+<div id="myModal" class="modal">
+  <!-- Modal_1 -->
+  <div id="modal_1" class="de-modal" style="display: none">
+    <div class="modal-content" style="width: 1080px">
+              <span class="close" onclick="modal_onoff(1, 2)">
+                <span class="material-symbols-outlined"> close </span>
+              </span>
+      <p class="modal-title" id="modal-title">결재자 지정</p>
+      <div class="modal-body">
+        <div class="modal-box-l">
+          <p class="list-title">임직원 목록</p>
+          <ul class="listbox" id="member-listbox" style="height: 500px">
+            <th:block th:each="dept : ${departmentList}">
+              <li class="list-dept" th:value="${dept.departmentNo}"
+                  th:text="${dept.departmentName}"></li>
+              <th:block th:each="member : ${dept.members}">
+                <li class="list" th:if="${member.memberNo != memberInfo.memberNo}"
+                    th:id="${'member-li-' + member.memberNo}" th:value="${member.memberNo}" ondblclick="doubleClickList(this)"
+                    onmousedown="handleList(this)" draggable="true" ondragend="dragoverEvent()">
+                  <span th:id="${'memberName-' + member.memberNo}" th:text="${member.memberName}"></span>
+                  <span th:id="${'memberStaff-' + member.memberNo}" th:text="${member.memberStaff}"></span>
+                </li>
+              </th:block>
+              <th:block th:each="childDept : ${dept.children}">
+                <th:block th:each="member : ${childDept.members}">
+                  <li class="list" th:if="${member.memberNo != memberInfo.memberNo}"
+                      th:id="${'member-li-' + member.memberNo}" th:value="${member.memberNo}" ondblclick="doubleClickList(this)"
+                      onmousedown="handleList(this)" draggable="true" ondragend="dragoverEvent()">
+                    <span th:id="${'memberName-' + member.memberNo}" th:text="${member.memberName}"></span>
+                    <span th:id="${'memberStaff-' + member.memberNo}" th:text="${member.memberStaff}"></span>
+                  </li>
+                </th:block>
+              </th:block>
+            </th:block>
+          </ul>
+        </div>
+        <div class="modal-box-r">
+          <!-- 결재라인 등록할 직원들 목록 -->
+          <p class="list-title">결재자</p>
+          <ul class="listbox members" id="approver-listbox" ondragover="dropList('approver', event)" style="height: 215px;">
+          </ul>
+          <!-- 참조라인 등록할 직원들 목록 -->
+          <p class="list-title" style="margin-top: 30px;">참조자</p>
+          <ul class="listbox members" id="referrer-listbox" ondragover="dropList('referrer', event)" style="height: 215px;">
+          </ul>
+        </div>
+        <p class="help_tip"><span class="material-symbols-outlined">help</span> 임직원 목록에서 더블클릭 시 결재자로 등록되며, 드래그로 참조자 등록이 가능합니다.</p>
+        <div class="btn_al_c">
+          <button type="button" class="btn_md navy" onclick="memberHandlerBtn()">등록</button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 모달 영역 종료 -->
+</body>
+<script src="/js/approval/approvalRegister.js"></script>
+<script src="/js/approval/approvalTempRegister.js"></script>
+</html>
